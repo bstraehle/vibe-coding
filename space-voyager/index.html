@@ -2,37 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Space Voyager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPACE VOYAGER</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="game-container">
-        <div class="score-display">Score: <span id="score">0</span></div>
-        <div id="spaceship" class="spaceship"></div>
-        <div class="stars"></div>
-        <div id="game-over" class="game-over">GAME OVER</div>
-        <div id="high-score" class="high-score">High Score: <span>0</span></div>
+        <div class="game-header">
+            <div class="score-display">
+                <span class="high-score">High Score: <span id="highScore">0</span></span>
+                <span class="current-score">Score: <span id="currentScore">0</span> ⭐</span>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="game-info">
+            <h1>SPACE VOYAGER</h1>
+            <div class="links">
+                <a href="https://agentmode.dev" target="_blank">agentmode.dev</a>
+            </div>
+            <div class="instructions">
+                <p>Use arrow keys or WASD to navigate your ship. Press SPACE to shoot and destroy asteroids. Alternatively, use mouse click to navigate and shoot.</p>
+                <p>Mission: Collect stars and destroy asteroids.</p>
+            </div>
+            <button id="restartBtn" class="restart-button" tabindex="0">Launch New Mission</button>
+        </div>
     </div>
-    <div class="controls-info">
-        <h2>SPACE VOYAGER</h2>
-        <p id="controls-text">Use arrow keys or WASD to navigate your ship. Press SPACE to shoot and destroy asteroids. Alternatively, use mouse click to navigate and shoot. Mission: Collect stars and destroy asteroids.</p>
-        <p style="color: #666;">The app was vibe coded in under 5 minutes, using GitHub Copilot and Anthropic Claude 3.7 Sonnet.</p>
-        <p style="color: #f00;">agentmode.dev</p>
-        <button id="start-btn">Launch Mission</button>
+    
+    <div id="gameOverScreen" class="game-over-screen hidden">
+        <div class="game-over-content">
+            <h2>GAME OVER</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button id="playAgainBtn" class="play-again-button" tabindex="0">Play Again</button>
+        </div>
     </div>
-    <script src="game.js"></script>
-    <script>
-        // Update controls text based on device type
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-            ('ontouchstart' in window) || 
-            (navigator.maxTouchPoints > 0)) {
-            document.getElementById('controls-text').textContent = 
-                'Touch and drag to move your ship. Tap to shoot and destroy asteroids. Mission: Collect stars and destroy asteroids.';
-        }
-    </script>
+    
+    <script src="script.js"></script>
 </body>
-</html>
+</html> 
