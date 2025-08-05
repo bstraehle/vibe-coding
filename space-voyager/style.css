@@ -105,7 +105,7 @@ body {
 }
 
 .restart-button:focus, .play-again-button:focus {
-    outline: 2px solid #4ecdc4;
+    outline: 2px solid #b20000;
     outline-offset: 2px;
     background: linear-gradient(45deg, #555, #777);
     transform: translateY(-2px);
