@@ -29,7 +29,7 @@ class SpaceGame {
         this.engineTrail = []; // Engine trail particles
         
         this.bulletSpeed = 8;
-        this.asteroidSpeed = 2;
+        this.asteroidSpeed = 1.2;
         this.starSpeed = 1;
         
         this.lastShot = 0;
@@ -556,14 +556,15 @@ class SpaceGame {
         this.drawEngineGlow(centerX, this.player.y + this.player.height);
         
         // Draw ship body with gradient
+        // Mean color scheme: dark red and metallic gray
         const shipGradient = this.ctx.createLinearGradient(
             this.player.x, this.player.y,
             this.player.x, this.player.y + this.player.height
         );
-        shipGradient.addColorStop(0, '#222');
-        shipGradient.addColorStop(0.5, '#111');
-        shipGradient.addColorStop(1, '#000');
-        
+        shipGradient.addColorStop(0, '#6b0000'); // dark red
+        shipGradient.addColorStop(0.5, '#222'); // metallic gray
+        shipGradient.addColorStop(1, '#111'); // black
+
         this.ctx.fillStyle = shipGradient;
         // Mean attack ship: sharp nose, swept wings, tail fins, cockpit
         this.ctx.beginPath();
@@ -589,18 +590,18 @@ class SpaceGame {
         this.ctx.fill();
 
         // Add ship outline
-        this.ctx.strokeStyle = '#fff';
+        this.ctx.strokeStyle = '#b20000'; // blood red outline
         this.ctx.lineWidth = 2.5;
         this.ctx.stroke();
 
         // Draw cockpit (smaller, more aggressive)
-        this.ctx.fillStyle = '#444';
+        this.ctx.fillStyle = '#b20000'; // cockpit: blood red
         this.ctx.beginPath();
         this.ctx.ellipse(centerX, this.player.y + this.player.height * 0.32, 4, 3, 0, 0, Math.PI * 2);
         this.ctx.fill();
 
         // Draw gun barrels (attack look)
-        this.ctx.fillStyle = '#888';
+        this.ctx.fillStyle = '#b20000'; // gun barrels: blood red
         this.ctx.fillRect(centerX - 2, this.player.y - 8, 4, 10);
 
         // Add glow effect
