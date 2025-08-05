@@ -1,0 +1,394 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rajdhani', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 10px;
+}
+
+.game-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 60vh;
+    min-height: 400px;
+    max-height: 600px;
+    background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.spaceship {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="ship-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23cccccc"/><stop offset="100%" stop-color="%23333333"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter></defs><path d="M50,10 L75,80 L50,65 L25,80 Z" fill="url(%23ship-grad)" stroke="%23555555" stroke-width="2" filter="url(%23glow)"/><circle cx="50" cy="40" r="10" fill="%23eee" opacity="0.7"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 10;
+    filter: drop-shadow(0 0 8px rgba(50, 50, 50, 0.8));
+    transition: transform 0.1s ease;
+}
+
+.asteroid {
+    position: absolute;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="asteroid-grad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" stop-color="%23888"/><stop offset="90%" stop-color="%23444"/></radialGradient><filter id="shadow"><feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="%23000"/></filter></defs><path d="M50,10 C70,10 85,20 90,40 C95,60 85,80 65,85 C45,90 25,85 15,65 C5,45 10,25 30,15 C35,12 45,10 50,10 Z" fill="url(%23asteroid-grad)" stroke="%23666" stroke-width="2" filter="url(%23shadow)"/><circle cx="30" cy="30" r="10" fill="%23555" opacity="0.7"/><circle cx="70" cy="40" r="8" fill="%23555" opacity="0.7"/><circle cx="50" cy="70" r="12" fill="%23555" opacity="0.6"/></svg>');
+    background-size: contain;
+    z-index: 5;
+}
+
+.star {
+    position: absolute;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="star-grad" cx="50%" cy="50%" r="50%" fx="75%" fy="25%"><stop offset="0%" stop-color="%23fff"/><stop offset="60%" stop-color="%23ffff00"/><stop offset="100%" stop-color="%23ffaa00"/></radialGradient><filter id="star-glow"><feGaussianBlur stdDeviation="2" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter></defs><path d="M50,0 L63,35 L100,35 L70,60 L80,100 L50,80 L20,100 L30,60 L0,35 L37,35 Z" fill="url(%23star-grad)" stroke="%23ffcc00" stroke-width="1" filter="url(%23star-glow)"/></svg>');
+    background-size: contain;
+    z-index: 5;
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.score-display {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: clamp(16px, 4vw, 24px);
+    color: #fff;
+    z-index: 20;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(50, 50, 50, 0.7);
+    background-color: rgba(10, 10, 10, 0.6);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(40, 40, 40, 0.3);
+}
+
+.high-score {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    font-size: clamp(16px, 4vw, 24px);
+    color: #fff;
+    z-index: 20;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(50, 50, 50, 0.7);
+    background-color: rgba(10, 10, 10, 0.6);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(40, 40, 40, 0.3);
+}
+
+.explosion {
+    position: absolute;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="explosion-grad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" stop-color="%23fff"/><stop offset="30%" stop-color="%23ffff00"/><stop offset="70%" stop-color="%23ff6600"/><stop offset="100%" stop-color="%23ff3300"/></radialGradient><filter id="explosion-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter></defs><circle cx="50" cy="50" r="40" fill="url(%23explosion-grad)" filter="url(%23explosion-glow)"/><g opacity="0.7"><circle cx="40" cy="40" r="3" fill="%23fff"/><circle cx="65" cy="35" r="2" fill="%23fff"/><circle cx="50" cy="50" r="4" fill="%23fff"/><circle cx="30" cy="60" r="2" fill="%23fff"/><circle cx="60" cy="70" r="3" fill="%23fff"/></g></svg>');
+    background-size: contain;
+    z-index: 15;
+    animation: explode 0.5s forwards;
+}
+
+@keyframes explode {
+    0% { transform: scale(0.1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+.controls-info {
+    text-align: center;
+    font-size: clamp(14px, 3.5vw, 18px);
+    background-color: #222;
+    padding: 15px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 10px;
+}
+
+.controls-info h2 {
+    font-size: clamp(24px, 6vw, 36px);
+    margin-bottom: 5px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background: #fff;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 5px rgba(250, 250, 250, 0.5);
+}
+
+#start-btn {
+    margin: 20px 0px 10px 0px;
+    padding: 12px 30px;
+    font-size: clamp(16px, 4vw, 18px);
+    background: #444;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    min-width: 200px;
+}
+
+#start-btn:hover {
+    background: #333;
+}
+
+.game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(32px, 12vw, 64px);
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 25px rgba(250, 250, 250, 0.5);
+    display: none;
+    z-index: 30;
+    animation: pulse 1.5s 3;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Add starry background effect */
+.stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.stars::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    box-shadow: 
+        10px 55px white, 60px 100px white, 100px 150px white, 
+        200px 80px white, 300px 120px white, 380px 170px white, 
+        450px 50px white, 520px 180px white, 590px 75px white, 
+        650px 130px white, 720px 60px white, 750px 200px white,
+        800px 50px white, 50px 230px white, 120px 280px white,
+        200px 300px white, 270px 250px white, 340px 320px white,
+        410px 350px white, 480px 270px white, 550px 330px white,
+        620px 290px white, 690px 370px white, 760px 340px white,
+        300px 380px white, 370px 430px white, 440px 480px white,
+        510px 410px white, 580px 460px white, 650px 400px white,
+        720px 450px white, 100px 410px white, 170px 450px white,
+        240px 430px white, 220px 500px white, 290px 520px white,
+        360px 540px white, 430px 530px white, 500px 510px white,
+        570px 550px white, 640px 500px white, 710px 540px white,
+        50px 530px white, 140px 550px white;
+    animation: twinkle 10s linear infinite;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+.engine-particle {
+    position: absolute;
+    background: radial-gradient(circle, rgba(200, 200, 200, 0.9) 0%, rgba(150, 150, 150, 0.5) 70%, rgba(100, 100, 100, 0) 100%);
+    border-radius: 50%;
+    z-index: 9;
+}
+
+.sparkle {
+    position: absolute;
+    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 240, 50, 0.8) 50%, rgba(255, 200, 0, 0) 100%);
+    border-radius: 50%;
+    z-index: 25;
+    box-shadow: 0 0 5px rgba(255, 240, 50, 0.8);
+}
+
+.data-controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#export-btn, .import-label {
+    padding: 8px 15px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    background: linear-gradient(135deg, #333333 0%, #222222 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+#export-btn:hover, .import-label:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #444444 0%, #333333 100%);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+.bullet {
+    position: absolute;
+    background: radial-gradient(circle, #ffffff 0%, #ff5500 60%, rgba(255, 85, 0, 0) 100%);
+    border-radius: 50%;
+    z-index: 8;
+    box-shadow: 0 0 8px rgba(255, 85, 0, 0.8), 0 0 16px rgba(255, 200, 0, 0.5);
+    animation: pulse-bullet 0.3s infinite alternate;
+}
+
+@keyframes pulse-bullet {
+    0% { transform: scale(0.8); }
+    100% { transform: scale(1.1); }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+        justify-content: flex-start;
+        padding-top: 10px;
+    }
+    
+    .game-container {
+        height: 50vh;
+        min-height: 300px;
+        margin-bottom: 10px;
+    }
+    
+    .spaceship {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .score-display, .high-score {
+        font-size: 16px;
+        padding: 3px 10px;
+    }
+    
+    .controls-info {
+        padding: 10px;
+        margin-top: 5px;
+    }
+    
+    .controls-info h2 {
+        font-size: 24px;
+        letter-spacing: 2px;
+    }
+    
+    #start-btn {
+        padding: 10px 25px;
+        font-size: 16px;
+        min-width: 180px;
+    }
+    
+    .game-over {
+        font-size: 32px;
+        letter-spacing: 1px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        height: 65vh;
+        min-height:375px;
+    }
+    
+    .spaceship {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .score-display, .high-score {
+        font-size: 14px;
+        padding: 2px 8px;
+    }
+    
+    .controls-info {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .controls-info h2 {
+        font-size: 20px;
+        letter-spacing: 1px;
+    }
+    
+    #start-btn {
+        padding: 8px 20px;
+        font-size: 14px;
+        min-width: 150px;
+    }
+    
+    .game-over {
+        font-size: 24px;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        padding: 2px;
+    }
+    
+    .game-container {
+        height: 70vh;
+        min-height: 200px;
+        margin-bottom: 5px;
+    }
+    
+    .controls-info {
+        padding: 5px;
+        margin-top: 2px;
+    }
+    
+    .controls-info h2 {
+        font-size: 18px;
+        margin-bottom: 2px;
+    }
+    
+    #start-btn {
+        margin: 10px 0px 5px 0px;
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+    #start-btn {
+        min-height: 44px; /* Minimum touch target size */
+    }
+    
+    .score-display, .high-score {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+}
