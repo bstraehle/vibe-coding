@@ -68,8 +68,7 @@ body {
     font-size: 2.5rem;
     margin-bottom: 15px;
     text-align: center;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    color: #b20000;
 }
 
 .instructions {
@@ -82,22 +81,6 @@ body {
 .instructions p {
     margin-bottom: 8px;
     color: #ccc;
-}
-
-.links {
-    color: #b20000;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.links a {
-    color: #ff4444;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.links a:hover {
-    color: #ff6666;
 }
 
 .restart-button, .play-again-button {

@@ -29,7 +29,12 @@ class SpaceGame {
         this.engineTrail = []; // Engine trail particles
         
         this.bulletSpeed = 8;
-        this.asteroidSpeed = 1.2;
+        // Adjust asteroid speed for mobile devices
+        if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            this.asteroidSpeed = 0.6; // slower for mobile
+        } else {
+            this.asteroidSpeed = 1.2;
+        }
         this.starSpeed = 1;
         
         this.lastShot = 0;
