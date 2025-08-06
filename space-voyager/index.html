@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
     <title>SPACE VOYAGER</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,8 +12,8 @@
     <div class="game-container">
         <div class="game-header">
             <div class="score-display">
-                <span class="high-score">High Score: <span id="highScore">0</span></span>
-                <span class="current-score">Score: <span id="currentScore">0</span></span>
+                <div class="high-score">High Score: <span id="highScore">0</span></div>
+                <div class="current-score">Score: <span id="currentScore">0</span></div>
             </div>
         </div>
         
@@ -21,9 +23,10 @@
             <h1>SPACE VOYAGER</h1>
             <div class="instructions">
                 <p>Mission: Collect stars and destroy asteroids.</p>
-                <p>Use arrow keys or WASD to navigate your ship. Press SPACE to shoot and destroy asteroids. Alternatively, use mouse click to navigate and shoot.</p>
+                <p class="desktop-only">Use arrow keys or WASD to navigate your ship. Press SPACE to shoot and destroy asteroids. Alternatively, use mouse click to navigate and shoot.</p>
+                <p class="mobile-only">Use tab to navigate your ship and to shoot and destroy asteroids.</p>
             </div>
-            <button id="restartBtn" class="restart-button" tabindex="0">Launch New Mission</button>
+            <button id="restartBtn" class="restart-button" tabindex="0">Launch</button>
         </div>
     </div>
     
