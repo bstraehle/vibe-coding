@@ -178,6 +178,16 @@ body {
 
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
+    .game-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #000;
+        padding: 20px;
+        z-index: 10;
+    }
+
     .game-info h1 {
         font-size: 1.8rem;
         margin-bottom: 15px;
@@ -226,12 +236,18 @@ body {
 
 @media (max-width: 480px) {
     .game-info {
-        padding: 15px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #000;
+        padding: 20px;
+        z-index: 10;
     }
     
     .game-info h1 {
         font-size: 1.5rem;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     
     .instructions {
