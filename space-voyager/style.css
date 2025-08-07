@@ -183,7 +183,7 @@ body {
     }
     
     .instructions {
-        font-size: 14px;
+        font-size: 1.0rem;
     }
     
     .score-display {
@@ -229,7 +229,7 @@ body {
     }
     
     .instructions {
-        font-size: 11px;
+        font-size: 1.0rem;
     }
     
     .score-display {
