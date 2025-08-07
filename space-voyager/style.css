@@ -98,7 +98,7 @@ body {
 
 .instructions p {
     color: #ccc;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .restart-button, .play-again-button {
@@ -180,7 +180,7 @@ body {
 @media (max-width: 768px) {
     .game-info h1 {
         font-size: 1.8rem;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     
     .instructions {
@@ -239,7 +239,7 @@ body {
     }
 
     .instructions p {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
     
     .score-display {
