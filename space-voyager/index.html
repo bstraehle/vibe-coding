@@ -13,8 +13,8 @@
     <div class="game-container">
         <div class="game-header">
             <div class="score-display">
-                <div class="high-score">High Score: <span id="highScore">0</span></div>
-                <div class="current-score">Score: <span id="currentScore">0</span></div>
+                <div class="score">High Score: <span id="highScore">0</span></div>
+                <div class="score">Score: <span id="currentScore">0</span></div>
             </div>
         </div>
         
@@ -23,11 +23,11 @@
         <div class="game-info">
             <h1>SPACE VOYAGER</h1>
             <div class="instructions">
-                <p style="line-height: 0.4;">Collect stars (+20) destroy asteroids (+10)</p>
+                <p class="compact-line">Collect stars (+20) and destroy asteroids (+10)</p>
                 <p class="desktop-only">Use arrow keys or WASD to navigate and press SPACE to shoot. Alternatively, use mouse click to navigate and shoot.</p>
                 <p class="mobile-only">Tap to navigate and shoot</p>
             </div>
-            <button id="restartBtn" class="restart-button" tabindex="0">Launch Mission</button>
+            <button id="restartBtn" class="action-button" tabindex="0" aria-label="Launch Mission">Launch Mission</button>
         </div>
     </div>
     
@@ -35,7 +35,7 @@
         <div class="game-over-content">
             <h2>GAME OVER</h2>
             <p>Final Score: <span id="finalScore">0</span></p>
-            <button id="playAgainBtn" class="play-again-button" tabindex="0">Play Again</button>
+            <button id="playAgainBtn" class="action-button" tabindex="0" aria-label="Play Again">Play Again</button>
         </div>
     </div>
     
