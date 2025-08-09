@@ -76,7 +76,7 @@ export const CONFIG = {
         SIZE_VARIATION: 25,
         SPAWN_Y: -40,
         HORIZONTAL_MARGIN: 40,
-        SPEED_VARIATION: 3
+        SPEED_VARIATION: 2
     },
     BULLET: {
         WIDTH: 4,
@@ -99,9 +99,9 @@ export const CONFIG = {
         STAR_SPAWN_RATE: 0.01
     },
     NEBULA: {
-        COUNT: 5,
-        RADIUS_MIN: 100,
-        RADIUS_MAX: 500
+        COUNT: 10,
+        RADIUS_MIN: 50,
+        RADIUS_MAX: 250
     },
     PLAYER: {
         SPAWN_Y_OFFSET: 100
@@ -113,12 +113,12 @@ export const CONFIG = {
         PLAYER: 8,
         BULLET: 8,
         ASTEROID_DESKTOP: 1.2,
-        ASTEROID_MOBILE: 0.6,
+        ASTEROID_MOBILE: 0.2,
         STAR: 1
     },
     STAR: {
         MIN_SIZE: 15,
-        SIZE_VARIATION: 10,
+        SIZE_VARIATION: 15,
         SPAWN_Y: -20,
         HORIZONTAL_MARGIN: 20,
         PARTICLE_BURST: 12,
