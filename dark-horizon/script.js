@@ -55,7 +55,7 @@ class DarkHorizon {
         this.engineTrail = new EngineTrail();
 
         this.resizeCanvas();
-        this.starField = StarField.init(this.canvas);
+        this.initBackground();
         this.drawBackground();
         
         this.asteroids = [];
@@ -252,7 +252,7 @@ class DarkHorizon {
         this.stars = [];
 
         this.hideGameInfo();
-
+        this.initBackground();
         this.gameLoop();
     }
 
@@ -325,6 +325,9 @@ class DarkHorizon {
      * Update all game objects and check collisions.
      */
     update() {
+        if (this.nebula) {
+            Nebula.update(this.nebula, this.time, this.canvas);
+        }
         this.updateAsteroids();
         this.updateBullets();
         this.updateEngineTrail();
@@ -574,11 +577,23 @@ class DarkHorizon {
     }
 
     /**
+     * Init the background.
+     */
+    initBackground() {
+        if (this.gameRunning) {
+            this.nebula = Nebula.init(this.canvas);
+        }
+        this.starField = StarField.init(this.canvas);
+    }
+
+    /**
      * Draw the background.
      */
     drawBackground() {
         Background.draw(this.ctx, this.canvas);
-        Nebula.draw(this.ctx, this.canvas);
+        if (this.gameRunning) {
+            Nebula.draw(this.ctx, this.canvas, this.nebula);
+        }
         StarField.draw(this.ctx, this.canvas, this.starField, this.time);
     }
 

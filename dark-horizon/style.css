@@ -1,12 +1,11 @@
 :root {
     --color-bg: #000;
     --color-bg-secondary: #111;
-    --color-header-bg: #000;
+    --color-header-bg: #rgba(0,0,0,0);
     --color-score-bg: #000;
     --color-score-border: #444;
     --color-text: #fff;
     --color-text-secondary: #ccc;
-    --color-accent: #b20000;
     --color-btn-gradient-start: #333;
     --color-btn-gradient-end: #555;
     --color-btn-gradient-hover-start: #555;
@@ -16,7 +15,7 @@
     --color-game-over-content-bg: rgba(20,20,20,0.95);
     --color-game-over-content-border: #333;
     --color-game-over-content-shadow: rgba(255,255,255,0.1);
-    --color-game-over-content-title-shadow: rgba(255,255,255,0.8);
+    --color-title-shadow: rgba(255,255,255,1);
 }
 * {
     margin: 0;
@@ -96,7 +95,7 @@ body {
     font-size: 2.5rem;
     margin-bottom: 20px;
     text-align: center;
-    color: var(--color-accent);
+    text-shadow: 0 0 20px var(--color-title-shadow);
 }
 .instructions {
     font-size: 1.25em;
@@ -154,10 +153,10 @@ body {
     box-shadow: 0 0 30px var(--color-game-over-content-shadow);
 }
 .game-over-content h2 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 20px;
     color: var(--color-text);
-    text-shadow: 0 0 20px var(--color-game-over-content-title-shadow);
+    text-shadow: 0 0 20px var(--color-title-shadow);
 }
 .game-over-content p {
     font-size: 1.5rem;
@@ -194,7 +193,7 @@ body {
     }
     .game-header {
         padding: 12px 16px;
-        background: rgba(0,0,0,0.8);
+        background: var(--color-header-bg);
     }
     .score-display {
         font-size: 14px;
@@ -222,19 +221,21 @@ body {
     }
     .score {
         padding: 6px 10px;
-        border: 1px solid #666;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        border: 1px solid var(--color-score-border);
         width: 45%;
         text-align: center;
     }
     .game-header {
         padding: 15px;
-        background: rgba(0,0,0,0.9);
+        background: var(--color-header-bg);
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 100;
+    }
+    .game-over-content h2 {
+        font-size: 1.5rem;
     }
     .action-button {
         padding: 8px 16px;

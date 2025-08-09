@@ -16,10 +16,10 @@
 export const CONFIG = {
     COLORS: {
         ASTEROID: {
-            GRAD_IN: '#888',
-            GRAD_MID: '#555',
+            GRAD_IN: '#666',
+            GRAD_MID: '#444',
             GRAD_OUT: '#222',
-            CRATER: '#555',
+            CRATER: '#444',
             OUTLINE: '#222'
         },
         BACKGROUND: {
@@ -46,19 +46,23 @@ export const CONFIG = {
             GRAD_OUT: 'rgba(255, 50, 0, 0)'
         },
         NEBULA: {
-            N1: 'rgba(80, 80, 80, 0.3)',
-            N2: 'rgba(40, 40, 40, 0.3)',
-            N1_OUT: 'rgba(80, 80, 80, 0)',
-            N2_OUT: 'rgba(40, 40, 40, 0)'
+            N1: 'rgba(80, 130, 255, 0.3)',
+            N2: 'rgba(255, 100, 100, 0.3)',
+            N3: 'rgba(255, 200, 100, 0.3)',
+            N4: 'rgba(180, 80, 255, 0.3)',
+            N1_OUT: 'rgba(80, 130, 255, 0)',
+            N2_OUT: 'rgba(255, 100, 100, 0)',
+            N3_OUT: 'rgba(255, 200, 100, 0)',
+            N4_OUT: 'rgba(180, 80, 255, 0)'
         },
         PLAYER: {
-            GRAD_TOP: '#6b0000',
-            GRAD_MID: '#222',
-            GRAD_BOTTOM: '#111',
-            OUTLINE: '#b20000',
+            GRAD_TOP: '#000',
+            GRAD_MID: '#ddd',
+            GRAD_BOTTOM: '#fff',
+            OUTLINE: '#bbb',
             COCKPIT: '#b20000',
             GUN: '#b20000',
-            SHADOW: '#222'
+            SHADOW: '#000'
         },
         STAR: {
             BASE: '#ffd700',
@@ -68,11 +72,11 @@ export const CONFIG = {
         }
     },
     ASTEROID: {
-        MIN_SIZE: 30,
-        SIZE_VARIATION: 20,
+        MIN_SIZE: 25,
+        SIZE_VARIATION: 25,
         SPAWN_Y: -40,
         HORIZONTAL_MARGIN: 40,
-        SPEED_VARIATION: 2
+        SPEED_VARIATION: 3
     },
     BULLET: {
         WIDTH: 4,
@@ -94,11 +98,16 @@ export const CONFIG = {
         ASTEROID_SPAWN_RATE: 0.02,
         STAR_SPAWN_RATE: 0.01
     },
+    NEBULA: {
+        COUNT: 5,
+        RADIUS_MIN: 100,
+        RADIUS_MAX: 500
+    },
     PLAYER: {
         SPAWN_Y_OFFSET: 100
     },
     SIZES: {
-        PLAYER: 30
+        PLAYER: 25
     },
     SPEEDS: {
         PLAYER: 8,

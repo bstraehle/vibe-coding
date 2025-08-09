@@ -231,33 +231,76 @@ export class Explosion {
 }
 
 /**
- * Provides static methods for rendering nebula visual effects in the game background.
+ * Class representing nebula visual effects for the game background.
+ * Provides static methods to initialize and render nebula gradients.
+ *
+ * Nebulae are rendered as radial gradients with randomized positions, radii, and colors.
  */
 export class Nebula {
     /**
-     * Draws nebula gradients on the canvas.
+     * Initializes nebula configurations for rendering.
+     * Generates an array of nebula objects with randomized position, radius, and color properties.
+     *
+     * @param {HTMLCanvasElement} canvas - The canvas element used to determine nebula positions and sizes.
+     * @returns {Array<Object>} Array of nebula configuration objects, each containing x, y, r, color0, and color1.
+     */
+    static init(canvas) {
+        const nebulaColors = [
+            { color0: CONFIG.COLORS.NEBULA.N1, color1: CONFIG.COLORS.NEBULA.N1_OUT },
+            { color0: CONFIG.COLORS.NEBULA.N2, color1: CONFIG.COLORS.NEBULA.N2_OUT },
+            { color0: CONFIG.COLORS.NEBULA.N3, color1: CONFIG.COLORS.NEBULA.N3_OUT },
+            { color0: CONFIG.COLORS.NEBULA.N4, color1: CONFIG.COLORS.NEBULA.N4_OUT }
+        ];
+        return Array.from({ length: CONFIG.NEBULA.COUNT }, () => {
+            const colorSet = nebulaColors[Math.floor(Math.random() * nebulaColors.length)];
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * CONFIG.NEBULA.RADIUS_MAX + CONFIG.NEBULA.RADIUS_MIN,
+                color0: colorSet.color0,
+                color1: colorSet.color1,
+                dx: (Math.random() - 0.5) * 0.7,
+                dy: (Math.random() - 0.5) * 0.7,
+                dr: (Math.random() - 0.5) * 0.3
+            };
+        });
+    }
+    /**
+     * Animates nebula by updating position and radius over time.
+     * @param {Array<Object>} nebulaConfigs - Array of nebula configuration objects.
+     * @param {number} time - Current game time/frame.
+     * @param {HTMLCanvasElement} canvas - The canvas element for bounds.
+     */
+    static update(nebulaConfigs, time, canvas) {
+        for (const nebula of nebulaConfigs) {
+            nebula.x += nebula.dx;
+            nebula.y += nebula.dy;
+            nebula.r += nebula.dr;
+            if (nebula.x < 0 || nebula.x > canvas.width) nebula.dx *= -1;
+            if (nebula.y < 0 || nebula.y > canvas.height) nebula.dy *= -1;
+            if (nebula.r < CONFIG.NEBULA.RADIUS_MIN || nebula.r > CONFIG.NEBULA.RADIUS_MAX) nebula.dr *= -1;
+        }
+    }
+    /**
+     * Draws nebula gradients on the canvas using the provided nebula configurations.
+     * Each nebula is rendered as a radial gradient at its specified position and radius.
+     *
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      * @param {HTMLCanvasElement} canvas - The canvas element.
+     * @param {Array<Object>} nebulaConfigs - Array of nebula configuration objects from Nebula.init().
      */
-    static draw(ctx, canvas) {
+    static draw(ctx, canvas, nebulaConfigs) {
         ctx.save();
-        ctx.globalAlpha = 0.1;
-        const nebula1 = ctx.createRadialGradient(
-            canvas.width * 0.3, canvas.height * 0.2, 0,
-            canvas.width * 0.3, canvas.height * 0.2, 200
-        );
-        nebula1.addColorStop(0, CONFIG.COLORS.NEBULA.N1);
-        nebula1.addColorStop(1, CONFIG.COLORS.NEBULA.N1_OUT);
-        const nebula2 = ctx.createRadialGradient(
-            canvas.width * 0.7, canvas.height * 0.8, 0,
-            canvas.width * 0.7, canvas.height * 0.8, 150
-        );
-        nebula2.addColorStop(0, CONFIG.COLORS.NEBULA.N2);
-        nebula2.addColorStop(1, CONFIG.COLORS.NEBULA.N2_OUT);
-        ctx.fillStyle = nebula1;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = nebula2;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (const nebula of nebulaConfigs) {
+            const grad = ctx.createRadialGradient(
+                nebula.x, nebula.y, 0,
+                nebula.x, nebula.y, nebula.r
+            );
+            grad.addColorStop(0, nebula.color0);
+            grad.addColorStop(1, nebula.color1);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         ctx.restore();
     }
 }
