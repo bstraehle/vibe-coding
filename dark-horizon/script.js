@@ -2,53 +2,86 @@
  * DarkHorizon game logic.
  *
  * This file implements the Dark Horizon game, a browser-based arcade shooter.
- * The player controls a ship, shoots asteroids, and collects stars for points.
+ * The player controls a ship, collects stars, and shoots asteroids for points.
  */
 
 import { CONFIG } from './constants.js';
-import { Asteroid, Background, Bullet, Explosion, Nebula, Particle, Player, Star } from './entities.js';
+import { Asteroid, Background, Bullet, EngineTrail, Explosion, Nebula, Particle, Player, Star, StarField } from './entities.js';
 
 /**
  * Main game class for DarkHorizon.
- * Handles game state, rendering, input, and logic.
+ * Handles game state, rendering, input, and logic for the arcade shooter.
+ * @class
  */
 class DarkHorizon {
     /**
      * Initialize game state and UI elements.
+     * Sets up UI, game variables, and event listeners.
      */
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
+        this.gameInfo = document.getElementById('gameInfo');
         this.gameOverScreen = document.getElementById('gameOverScreen');
         this.startBtn = document.getElementById('startBtn');
         this.restartBtn = document.getElementById('restartBtn');
 
-        this.highScore = Number(localStorage.getItem('spaceVoyagerHighScore')) || 0;
+        this.highScore = Number(localStorage.getItem('darkHorizonHighScore')) || 0;
         this.score = 0;
-
-        this.gameRunning = false;
+        this.updateHighScore();
 
         this.keys = {};
         this.mousePos = { x: 0, y: 0 };
 
-        this.player = this.createPlayer();
-        this.asteroids = [];
-        this.bullets = [];
-        this.engineTrail = [];
-        this.explosions = [];
-        this.particles = [];
-        this.starField = [];
-        this.stars = [];
-
-        this.bulletSpeed = CONFIG.SPEEDS.BULLET;
         this.asteroidSpeed = this.isMobile() ? CONFIG.SPEEDS.ASTEROID_MOBILE : CONFIG.SPEEDS.ASTEROID_DESKTOP;
+        this.bulletSpeed = CONFIG.SPEEDS.BULLET;
         this.starSpeed = CONFIG.SPEEDS.STAR;
 
         this.lastShot = 0;
         this.shotCooldown = CONFIG.GAME.SHOT_COOLDOWN;
 
+        this.gameRunning = false;
+
         this.time = 0;
 
+        this.player = new Player(
+            0,
+            0,
+            CONFIG.SIZES.PLAYER,
+            CONFIG.SIZES.PLAYER,
+            CONFIG.SPEEDS.PLAYER
+        );
+
+        this.engineTrail = new EngineTrail();
+
+        this.resizeCanvas();
+        this.starField = StarField.init(this.canvas);
+        this.drawBackground();
+        
+        this.asteroids = [];
+        this.bullets = [];
+        this.explosions = [];
+        this.particles = [];
+        this.stars = [];
+
+        this.bindEventHandlers();
+        this.setupEventListeners();
+
+        this.startBtn.focus();
+    }
+
+    /**
+     * Detect if the user is on a mobile device.
+     * @returns {boolean} True if mobile device detected, else false.
+     */
+    isMobile() {
+        return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Mobi|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    /**
+     * Bind all event handler methods to the current instance.
+     */
+    bindEventHandlers() {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -60,62 +93,6 @@ class DarkHorizon {
         this.handleRestartKeyDown = this.handleRestartKeyDown.bind(this);
         this.resizeCanvas = this.resizeCanvas.bind(this);
         this.shoot = this.shoot.bind(this);
-
-        this.init();
-    }
-
-    /**
-     * Detect if the user is on a mobile device.
-     */
-    isMobile() {
-        return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    
-    /**
-     * Initialize canvas, event listeners, scores, and starfield.
-     */
-    init() {
-        this.resizeCanvas();
-        this.updateHighScore();
-        this.initStarField();
-        this.drawAnimatedStarField();
-        this.setupEventListeners();
-        this.startBtn.focus();
-    }
-    
-    /**
-     * Resize the game canvas and reposition the player.
-     */
-    resizeCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.player.x = this.canvas.width / 2 - this.player.width / 2;
-        this.player.y = this.canvas.height - this.player.height - 100;
-        this.initStarField();
-    }
-
-    /**
-     * Update and persist the high score if needed.
-     */
-    updateHighScore() {
-        if (this.score > this.highScore) {
-            this.highScore = this.score;
-            localStorage.setItem('spaceVoyagerHighScore', this.highScore);
-        }
-        document.getElementById('highScore').textContent = this.highScore;
-    }
-
-    /**
-     * Create the animated background starfield.
-     */
-    initStarField() {
-        this.starField = Array.from({ length: CONFIG.GAME.STARFIELD_COUNT }, () => ({
-            x: Math.random() * this.canvas.width,
-            y: Math.random() * this.canvas.height,
-            size: Math.random() * 2 + 0.5,
-            speed: Math.random() * 0.5 + 0.1,
-            brightness: Math.random() * 0.5 + 0.5
-        }));
     }
 
     /**
@@ -131,18 +108,19 @@ class DarkHorizon {
         // Touch events for mobile
         this.canvas.addEventListener('touchmove', this.handleTouchMove);
         this.canvas.addEventListener('touchstart', this.handleTouchStart);
-        // Window resize
-        window.addEventListener('resize', this.resizeCanvas);
         // Button events
         this.startBtn.addEventListener('click', this.handleStartClick);
         this.restartBtn.addEventListener('click', this.handleRestartClick);
         // Keyboard accessibility for buttons
         this.startBtn.addEventListener('keydown', this.handleStartKeyDown);
         this.restartBtn.addEventListener('keydown', this.handleRestartKeyDown);
+        // Window resize
+        window.addEventListener('resize', this.resizeCanvas);
     }
 
     /**
-     * Handle keydown events for movement and shooting.
+     * Handle keydown events.
+     * @param {KeyboardEvent} e - The keyboard event.
      */
     handleKeyDown(e) {
         if (document.activeElement === this.startBtn || document.activeElement === this.restartBtn) return;
@@ -158,14 +136,16 @@ class DarkHorizon {
     }
 
     /**
-     * Handle keyup events for movement.
+     * Handle keyup events.
+     * @param {KeyboardEvent} e - The keyboard event.
      */
     handleKeyUp(e) {
         this.keys[e.code] = false;
     }
 
     /**
-     * Track mouse position for player movement.
+     * Track mouse position.
+     * @param {MouseEvent} e - The mouse event.
      */
     handleMouseMove(e) {
         const rect = this.canvas.getBoundingClientRect();
@@ -174,7 +154,8 @@ class DarkHorizon {
     }
 
     /**
-     * Track touch position for player movement (mobile).
+     * Track touch position (mobile).
+     * @param {TouchEvent} e - The touch event.
      */
     handleTouchMove(e) {
         e.preventDefault();
@@ -185,7 +166,8 @@ class DarkHorizon {
     }
 
     /**
-     * Handle touch start event for shooting (mobile).
+     * Handle touch start event (mobile).
+     * @param {TouchEvent} e - The touch event.
      */
     handleTouchStart(e) {
         e.preventDefault();
@@ -193,7 +175,7 @@ class DarkHorizon {
     }
 
     /**
-     * Restart the game when restart button is clicked.
+     * Start the game when start button is clicked.
      */
     handleStartClick() {
         this.startGame();
@@ -201,7 +183,7 @@ class DarkHorizon {
     }
 
     /**
-     * Restart the game from game over screen.
+     * Restart the game when restart button is clicked.
      */
     handleRestartClick() {
         this.hideGameOver();
@@ -210,7 +192,8 @@ class DarkHorizon {
     }
 
     /**
-     * Keyboard accessibility for restart button.
+     * Keyboard accessibility for start button.
+     * @param {KeyboardEvent} e - The keyboard event.
      */
     handleStartKeyDown(e) {
         if (e.code === 'Enter' || e.code === 'Space') {
@@ -221,7 +204,8 @@ class DarkHorizon {
     }
 
     /**
-     * Keyboard accessibility for play again button.
+     * Keyboard accessibility for restart button.
+     * @param {KeyboardEvent} e - The keyboard event.
      */
     handleRestartKeyDown(e) {
         if (e.code === 'Enter' || e.code === 'Space') {
@@ -241,25 +225,37 @@ class DarkHorizon {
         this.bullets.push(this.createBullet());
         this.lastShot = now;
     }
-    
+      
     /**
-     * Start or restart the game, reset state and scores.
+     * Resize the game canvas and reposition the player.
+     */
+    resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.player.x = this.canvas.width / 2 - this.player.width / 2;
+        this.player.y = this.canvas.height - this.player.height - 100;
+    }
+   
+    /**
+     * Start or restart the game, reset scores and state.
      */
     startGame() {
-        this.score = 0;
         this.gameRunning = true;
+
+        this.score = 0;
+        this.updateScore();
+                
         this.asteroids = [];
         this.bullets = [];
-        this.engineTrail = [];
         this.explosions = [];
         this.particles = [];
         this.stars = [];
-        document.querySelector('.game-info').style.display = 'none';
-        this.updateScore();
-        this.hideGameOver();
+
+        this.hideGameInfo();
+
         this.gameLoop();
     }
-    
+
     /**
      * Main game loop: update and draw each frame.
      */
@@ -272,7 +268,7 @@ class DarkHorizon {
     }
 
     /**
-     * End the game and show the game over screen.
+     * End the game.
      */
     gameOver() {
         this.gameRunning = false;
@@ -281,10 +277,11 @@ class DarkHorizon {
     }
     
     /**
-     * Display the game over screen and final score.
+     * Show the game over screen.
      */
     showGameOver() {
         document.getElementById('finalScore').textContent = this.score;
+        
         this.gameOverScreen.classList.remove('hidden');
         
         setTimeout(() => {
@@ -300,10 +297,28 @@ class DarkHorizon {
     }
 
     /**
+     * Hide the game info.
+     */
+    hideGameInfo() {
+        this.gameInfo.classList.add('hidden');
+    }
+
+    /**
      * Update the displayed current score.
      */
     updateScore() {
         document.getElementById('currentScore').textContent = this.score;
+    }
+
+    /**
+     * Update and persist the high score if needed.
+     */
+    updateHighScore() {
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem('darkHorizonHighScore', this.highScore);
+        }
+        document.getElementById('highScore').textContent = this.highScore;
     }
 
     /**
@@ -352,26 +367,9 @@ class DarkHorizon {
      */
     updateEngineTrail() {
         if (this.gameRunning) {
-            const centerX = this.player.x + this.player.width / 2;
-            const trailY = this.player.y + this.player.height;
-            
-            this.engineTrail.push({
-                x: centerX + (Math.random() - 0.5) * 4,
-                y: trailY,
-                life: 20,
-                size: Math.random() * 3 + 1
-            });
+            this.engineTrail.add(this.player);
         }
-        
-        for (let i = this.engineTrail.length - 1; i >= 0; i--) {
-            const particle = this.engineTrail[i];
-            particle.y += 2;
-            particle.life--;
-            
-            if (particle.life <= 0) {
-                this.engineTrail.splice(i, 1);
-            }
-        }
+        this.engineTrail.update();
     }
 
     /**
@@ -472,6 +470,9 @@ class DarkHorizon {
     
     /**
      * Axis-aligned bounding box collision detection.
+     * @param {{x: number, y: number, width: number, height: number}} rect1 - First rectangle.
+     * @param {{x: number, y: number, width: number, height: number}} rect2 - Second rectangle.
+     * @returns {boolean} True if collision detected, else false.
      */
     checkCollision(rect1, rect2) {
         return (
@@ -484,6 +485,7 @@ class DarkHorizon {
 
     /**
      * Create a new asteroid object with random size and speed.
+     * @returns {Asteroid} A new asteroid instance.
      */
     createAsteroid() {
         const width = CONFIG.ASTEROID.MIN_SIZE + Math.random() * CONFIG.ASTEROID.SIZE_VARIATION;
@@ -500,6 +502,7 @@ class DarkHorizon {
 
     /**
      * Create a new bullet object at the player's position.
+     * @returns {Bullet} A new bullet instance.
      */
     createBullet() {
         return new Bullet(
@@ -513,6 +516,8 @@ class DarkHorizon {
 
     /**
      * Create explosion and particle effects at given position.
+     * @param {number} x - X coordinate of explosion center.
+     * @param {number} y - Y coordinate of explosion center.
      */
     createExplosion(x, y) {
         for (let i = 0; i < CONFIG.EXPLOSION.PARTICLE_COUNT; i++) {
@@ -538,20 +543,8 @@ class DarkHorizon {
     }
 
     /**
-     * Create a new player object with default position and size.
-     */
-    createPlayer() {
-        return new Player(
-            0,
-            0,
-            CONFIG.SIZES.PLAYER,
-            CONFIG.SIZES.PLAYER,
-            CONFIG.SPEEDS.PLAYER
-        );
-    }
-
-    /**
      * Create a new collectible star object with random size and speed.
+     * @returns {Star} A new star instance.
      */
     createStar() {
         const width = CONFIG.STAR.MIN_SIZE + Math.random() * CONFIG.STAR.SIZE_VARIATION;
@@ -570,37 +563,23 @@ class DarkHorizon {
      * Draw all game objects and background for the current frame.
      */
     draw() {
-        Background.draw(this.ctx, this.canvas);
-        Nebula.draw(this.ctx, this.canvas);
-        this.drawAnimatedStarField();
-        this.player.draw(this.ctx);
+        this.drawBackground();
         this.drawAsteroids();
         this.drawBullets();
         this.drawCollectibleStars();
         this.drawExplosions();
         this.drawParticles();
-        this.player.drawEngineTrail(this.ctx, this.engineTrail);
+        this.player.draw(this.ctx);
+        this.engineTrail.draw(this.ctx);
     }
-    
+
     /**
-     * Draw the animated starfield background.
+     * Draw the background.
      */
-    drawAnimatedStarField() {
-        this.ctx.fillStyle = CONFIG.COLORS.STAR.GRAD_IN;
-        this.starField.forEach(star => {
-            star.y += star.speed;
-            if (star.y > this.canvas.height) {
-                star.y = -5;
-                star.x = Math.random() * this.canvas.width;
-            }
-            const twinkle = Math.sin(this.time * 0.01 + star.x) * 0.3 + 0.7;
-            this.ctx.globalAlpha = star.brightness * twinkle;
-            this.ctx.shadowColor = CONFIG.COLORS.STAR.GRAD_IN;
-            this.ctx.shadowBlur = star.size * 2;
-            this.ctx.fillRect(star.x, star.y, star.size, star.size);
-            this.ctx.shadowBlur = 0;
-        });
-        this.ctx.globalAlpha = 1;
+    drawBackground() {
+        Background.draw(this.ctx, this.canvas);
+        Nebula.draw(this.ctx, this.canvas);
+        StarField.draw(this.ctx, this.canvas, this.starField, this.time);
     }
 
     /**

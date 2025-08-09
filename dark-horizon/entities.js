@@ -1,8 +1,17 @@
-// Dark Horizon entity classes
-
 import { CONFIG } from './constants.js';
 
+/**
+ * Represents an asteroid obstacle in the game world, managing its position, movement, and visual appearance.
+ */
 export class Asteroid {
+    /**
+     * Creates an instance of Asteroid.
+     * @param {number} x - The x position of the asteroid.
+     * @param {number} y - The y position of the asteroid.
+     * @param {number} width - The width of the asteroid.
+     * @param {number} height - The height of the asteroid.
+     * @param {number} speed - The speed of the asteroid.
+     */
     constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
@@ -10,9 +19,16 @@ export class Asteroid {
         this.height = height;
         this.speed = speed;
     }
+    /**
+     * Updates the asteroid's position.
+     */
     update() {
         this.y += this.speed;
     }
+    /**
+     * Draws the asteroid on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
@@ -40,7 +56,15 @@ export class Asteroid {
     }
 }
 
+/**
+ * Provides static methods for rendering the main game background gradient.
+ */
 export class Background {
+    /**
+     * Draws the background gradient.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     */
     static draw(ctx, canvas) {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, CONFIG.COLORS.BACKGROUND.TOP);
@@ -51,7 +75,18 @@ export class Background {
     }
 }
 
+/**
+ * Models a projectile fired by the player, including its movement and rendering.
+ */
 export class Bullet {
+    /**
+     * Creates an instance of Bullet.
+     * @param {number} x - The x position of the bullet.
+     * @param {number} y - The y position of the bullet.
+     * @param {number} width - The width of the bullet.
+     * @param {number} height - The height of the bullet.
+     * @param {number} speed - The speed of the bullet.
+     */
     constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
@@ -59,9 +94,16 @@ export class Bullet {
         this.height = height;
         this.speed = speed;
     }
+    /**
+     * Updates the bullet's position.
+     */
     update() {
         this.y -= this.speed;
     }
+    /**
+     * Draws the bullet on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
     ctx.shadowColor = CONFIG.COLORS.BULLET.SHADOW;
         ctx.shadowBlur = 8;
@@ -77,7 +119,76 @@ export class Bullet {
     }
 }
 
+/**
+ * Manages and renders the glowing engine trail particles emitted by the player ship.
+ */
+export class EngineTrail {
+    constructor() {
+        this.particles = [];
+    }
+    /**
+     * Adds a new particle to the engine trail.
+     * @param {Player} player - The player object.
+     */
+    add(player) {
+        const centerX = player.x + player.width / 2;
+        const trailY = player.y + player.height;
+        this.particles.push({
+            x: centerX + (Math.random() - 0.5) * 4,
+            y: trailY,
+            life: 20,
+            size: Math.random() * 3 + 1
+        });
+    }
+    /**
+     * Updates all engine trail particles.
+     */
+    update() {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const particle = this.particles[i];
+            particle.y += 2;
+            particle.life--;
+            if (particle.life <= 0) {
+                this.particles.splice(i, 1);
+            }
+        }
+    }
+    /**
+     * Draws all engine trail particles.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
+    draw(ctx) {
+        this.particles.forEach(particle => {
+            const alpha = particle.life / 20;
+            ctx.globalAlpha = alpha;
+            const trailGradient = ctx.createRadialGradient(
+                particle.x, particle.y, 0,
+                particle.x, particle.y, particle.size * 2
+            );
+            trailGradient.addColorStop(0, CONFIG.COLORS.ENGINE.GLOW1);
+            trailGradient.addColorStop(1, CONFIG.COLORS.ENGINE.GLOW3);
+            ctx.fillStyle = trailGradient;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+    }
+}
+
+/**
+ * Handles the visual representation and animation of explosion effects for collisions and object destruction.
+ */
 export class Explosion {
+    /**
+     * Creates an instance of Explosion.
+     * @param {number} x - The x position of the explosion.
+     * @param {number} y - The y position of the explosion.
+     * @param {number} width - The width of the explosion.
+     * @param {number} height - The height of the explosion.
+     * @param {number} life - The current life of the explosion.
+     * @param {number} maxLife - The maximum life of the explosion.
+     */
     constructor(x, y, width, height, life, maxLife) {
         this.x = x;
         this.y = y;
@@ -86,9 +197,16 @@ export class Explosion {
         this.life = life;
         this.maxLife = maxLife;
     }
+    /**
+     * Updates the explosion's life.
+     */
     update() {
         this.life--;
     }
+    /**
+     * Draws the explosion on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         const alpha = this.life / this.maxLife;
         const scale = 1 + (1 - alpha) * 2;
@@ -112,7 +230,15 @@ export class Explosion {
     }
 }
 
+/**
+ * Provides static methods for rendering nebula visual effects in the game background.
+ */
 export class Nebula {
+    /**
+     * Draws nebula gradients on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     */
     static draw(ctx, canvas) {
         ctx.save();
         ctx.globalAlpha = 0.1;
@@ -136,7 +262,21 @@ export class Nebula {
     }
 }
 
+/**
+ * Models a single particle used in visual effects such as explosions, trails, or other dynamic elements.
+ */
 export class Particle {
+    /**
+     * Creates an instance of Particle.
+     * @param {number} x - The x position of the particle.
+     * @param {number} y - The y position of the particle.
+     * @param {number} vx - The x velocity of the particle.
+     * @param {number} vy - The y velocity of the particle.
+     * @param {number} life - The current life of the particle.
+     * @param {number} maxLife - The maximum life of the particle.
+     * @param {number} size - The size of the particle.
+     * @param {string} color - The color of the particle.
+     */
     constructor(x, y, vx, vy, life, maxLife, size, color) {
         this.x = x;
         this.y = y;
@@ -147,12 +287,19 @@ export class Particle {
         this.size = size;
         this.color = color;
     }
+    /**
+     * Updates the particle's position and life.
+     */
     update() {
         this.x += this.vx;
         this.y += this.vy;
         this.life--;
         this.vy += 0.1;
     }
+    /**
+     * Draws the particle on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         const alpha = this.life / this.maxLife;
         ctx.globalAlpha = alpha;
@@ -167,7 +314,18 @@ export class Particle {
     }
 }
 
+/**
+ * Represents the player-controlled spaceship, including movement, input handling, and rendering.
+ */
 export class Player {
+    /**
+     * Creates an instance of Player.
+     * @param {number} x - The x position of the player ship.
+     * @param {number} y - The y position of the player ship.
+     * @param {number} width - The width of the player ship.
+     * @param {number} height - The height of the player ship.
+     * @param {number} speed - The speed of the player ship.
+     */
     constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
@@ -175,6 +333,12 @@ export class Player {
         this.height = height;
         this.speed = speed;
     }
+    /**
+     * Updates the player's position based on input or mouse position.
+     * @param {Object} input - The input state.
+     * @param {{x: number, y: number}} mousePos - The mouse position.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     */
     update(input, mousePos, canvas) {
         const keyboardPressed = input['ArrowLeft'] || input['KeyA'] ||
             input['ArrowRight'] || input['KeyD'] ||
@@ -194,6 +358,10 @@ export class Player {
         this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
         this.y = Math.max(0, Math.min(canvas.height - this.height, this.y));
     }
+    /**
+     * Draws the player ship on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
@@ -229,23 +397,12 @@ export class Player {
         ctx.stroke();
         ctx.shadowBlur = 0;
     }
-    drawEngineTrail(ctx, engineTrail) {
-        engineTrail.forEach(particle => {
-            const alpha = particle.life / 20;
-            ctx.globalAlpha = alpha;
-            const trailGradient = ctx.createRadialGradient(
-                particle.x, particle.y, 0,
-                particle.x, particle.y, particle.size * 2
-            );
-            trailGradient.addColorStop(0, CONFIG.COLORS.ENGINE.GLOW1);
-            trailGradient.addColorStop(1, CONFIG.COLORS.ENGINE.GLOW3);
-            ctx.fillStyle = trailGradient;
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        ctx.globalAlpha = 1;
-    }
+    /**
+     * Draws the engine glow for the player ship.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {number} x - The x position for the glow.
+     * @param {number} y - The y position for the glow.
+     */
     static drawEngineGlow(ctx, x, y) {
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
         gradient.addColorStop(0, CONFIG.COLORS.ENGINE.GLOW1);
@@ -256,7 +413,18 @@ export class Player {
     }
 }
 
+/**
+ * Models a single star in the background, including its animation and rendering.
+ */
 export class Star {
+    /**
+     * Creates an instance of Star.
+     * @param {number} x - The x position of the star.
+     * @param {number} y - The y position of the star.
+     * @param {number} width - The width of the star.
+     * @param {number} height - The height of the star.
+     * @param {number} speed - The speed of the star.
+     */
     constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
@@ -264,9 +432,17 @@ export class Star {
         this.height = height;
         this.speed = speed;
     }
+    /**
+     * Updates the star's position.
+     */
     update() {
         this.y += this.speed;
     }
+    /**
+     * Draws the star on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {number} time - The current time for animation.
+     */
     draw(ctx, time) {
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
@@ -283,6 +459,13 @@ export class Star {
         Star.drawStar(ctx, centerX, centerY, scaledSize);
         ctx.shadowBlur = 0;
     }
+    /**
+     * Draws a star shape.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {number} x - The x position of the star.
+     * @param {number} y - The y position of the star.
+     * @param {number} size - The size of the star.
+     */
     static drawStar(ctx, x, y, size) {
         ctx.beginPath();
         for (let i = 0; i < 5; i++) {
@@ -298,5 +481,49 @@ export class Star {
         }
         ctx.closePath();
         ctx.fill();
+    }
+}
+
+/**
+ * Provides static methods for initializing and rendering the animated star field background.
+ */
+export class StarField {
+    /**
+     * Initializes the star field array.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     * @returns {Array<Object>} Array of star objects.
+     */
+    static init(canvas) {
+        return Array.from({ length: CONFIG.GAME.STARFIELD_COUNT }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2 + 0.5,
+            speed: Math.random() * 0.5 + 0.1,
+            brightness: Math.random() * 0.5 + 0.5
+        }));
+    }
+    /**
+     * Draws the star field on the canvas.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     * @param {Array<Object>} starField - Array of star objects.
+     * @param {number} time - The current time for animation.
+     */
+    static draw(ctx, canvas, starField, time) {
+        ctx.fillStyle = CONFIG.COLORS.STAR.GRAD_IN;
+        starField.forEach(star => {
+            star.y += star.speed;
+            if (star.y > canvas.height) {
+                star.y = -5;
+                star.x = Math.random() * canvas.width;
+            }
+            const twinkle = Math.sin(time * 0.01 + star.x) * 0.3 + 0.7;
+            ctx.globalAlpha = star.brightness * twinkle;
+            ctx.shadowColor = CONFIG.COLORS.STAR.GRAD_IN;
+            ctx.shadowBlur = star.size * 2;
+            ctx.fillRect(star.x, star.y, star.size, star.size);
+            ctx.shadowBlur = 0;
+        });
+        ctx.globalAlpha = 1;
     }
 }

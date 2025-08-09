@@ -1,5 +1,18 @@
-// Dark Horizon game constants
-
+/**
+ * Dark Horizon game configuration constants.
+ *
+ * @constant
+ * @type {Object}
+ * @property {Object} COLORS - Color definitions for game elements.
+ * @property {Object} ASTEROID - Asteroid properties.
+ * @property {Object} BULLET - Bullet properties.
+ * @property {Object} EXPLOSION - Explosion properties.
+ * @property {Object} GAME - General game settings.
+ * @property {Object} PLAYER - Player properties.
+ * @property {Object} SIZES - Size settings for entities.
+ * @property {Object} SPEEDS - Speed settings for entities.
+ * @property {Object} STAR - Star properties.
+ */
 export const CONFIG = {
     COLORS: {
         ASTEROID: {
@@ -54,12 +67,6 @@ export const CONFIG = {
             GRAD_OUT: '#ffa500'
         }
     },
-    GAME: {
-        SHOT_COOLDOWN: 200,
-        STARFIELD_COUNT: 150,
-        ASTEROID_SPAWN_RATE: 0.02,
-        STAR_SPAWN_RATE: 0.01
-    },
     ASTEROID: {
         MIN_SIZE: 30,
         SIZE_VARIATION: 20,
@@ -81,18 +88,14 @@ export const CONFIG = {
         OFFSET: 25,
         LIFE: 15
     },
+    GAME: {
+        SHOT_COOLDOWN: 200,
+        STARFIELD_COUNT: 150,
+        ASTEROID_SPAWN_RATE: 0.02,
+        STAR_SPAWN_RATE: 0.01
+    },
     PLAYER: {
         SPAWN_Y_OFFSET: 100
-    },
-    STAR: {
-        MIN_SIZE: 15,
-        SIZE_VARIATION: 10,
-        SPAWN_Y: -20,
-        HORIZONTAL_MARGIN: 20,
-        PARTICLE_BURST: 12,
-        PARTICLE_LIFE: 20,
-        PARTICLE_SIZE_MIN: 1,
-        PARTICLE_SIZE_VARIATION: 2
     },
     SIZES: {
         PLAYER: 30
@@ -103,5 +106,15 @@ export const CONFIG = {
         ASTEROID_DESKTOP: 1.2,
         ASTEROID_MOBILE: 0.6,
         STAR: 1
+    },
+    STAR: {
+        MIN_SIZE: 15,
+        SIZE_VARIATION: 10,
+        SPAWN_Y: -20,
+        HORIZONTAL_MARGIN: 20,
+        PARTICLE_BURST: 12,
+        PARTICLE_LIFE: 20,
+        PARTICLE_SIZE_MIN: 1,
+        PARTICLE_SIZE_VARIATION: 2
     }
 };
