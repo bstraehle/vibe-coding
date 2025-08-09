@@ -60,7 +60,7 @@ body {
 .score-display {
     align-items: center;
     display: flex;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: bold;
     justify-content: space-between;
     position: relative;
@@ -115,7 +115,7 @@ body {
     color: var(--color-text);
     cursor: pointer;
     display: block;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: bold;
     margin: 0 auto;
     padding: 12px 24px;
@@ -184,9 +184,6 @@ body {
     .instructions {
         font-size: 1rem;
     }
-    .score-display {
-        font-size: 14px;
-    }
     .game-over-content h2 {
         font-size: 2rem;
     }
@@ -194,7 +191,6 @@ body {
         font-size: 1.2rem;
     }
     .action-button {
-        font-size: 14px;
         padding: 10px 20px;
     }
 }
@@ -213,7 +209,6 @@ body {
         font-size: 1.5rem;
     }
     .action-button {
-        font-size: 13px;
         padding: 8px 16px;
     }
 }
