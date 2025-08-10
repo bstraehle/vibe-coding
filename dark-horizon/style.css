@@ -179,6 +179,12 @@ body {
 }
 
 @media (max-width: 480px) {
+    .desktop-only { 
+        display: none !important; 
+    }
+    .mobile-only { 
+        display: block !important; 
+    }
     .game-header {
         position: fixed;
     }
