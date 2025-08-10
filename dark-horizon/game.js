@@ -391,7 +391,7 @@ class DarkHorizon {
      */
     update() {
         if (this.nebulaConfigs) {
-            Nebula.update(this.canvas, this.nebulaConfigs, this._isMobile);
+            Nebula.update(this.view.width, this.view.height, this.nebulaConfigs, this._isMobile);
         }
         this.updateAsteroids();
         this.updateBullets();
@@ -633,21 +633,21 @@ class DarkHorizon {
      * Init the background.
      */
     initBackground() {
-    if (this.gameRunning) {
-            this.nebulaConfigs = Nebula.init(this.canvas, this._isMobile);
+        if (this.gameRunning) {
+            this.nebulaConfigs = Nebula.init(this.view.width, this.view.height, this._isMobile);
         }
-        this.starField = StarField.init(this.canvas);
+        this.starField = StarField.init(this.view.width, this.view.height);
     }
 
     /**
      * Draw the background.
      */
     drawBackground() {
-        Background.draw(this.ctx, this.canvas);
-        if (this.gameRunning) {
-            Nebula.draw(this.ctx, this.canvas, this.nebulaConfigs);
+        Background.draw(this.ctx, this.view.width, this.view.height);
+        if (this.gameRunning && this.nebulaConfigs) {
+            Nebula.draw(this.ctx, this.nebulaConfigs);
         }
-        StarField.draw(this.ctx, this.canvas, this.starField, this.time);
+        StarField.draw(this.ctx, this.view.width, this.view.height, this.starField, this.time);
         if (this.gameRunning && this.paused) {
             this.ctx.save();
             this.ctx.fillStyle = CONFIG.UI.PAUSE_OVERLAY.BACKDROP;

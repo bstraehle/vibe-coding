@@ -75,16 +75,17 @@ export class Background {
     /**
      * Draws the background gradient.
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     * @param {HTMLCanvasElement} canvas - The canvas element.
+     * @param {number} width - Canvas width in logical pixels.
+     * @param {number} height - Canvas height in logical pixels.
      */
-    static draw(ctx, canvas) {
+    static draw(ctx, width, height) {
         ctx.save();
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
         gradient.addColorStop(0, CONFIG.COLORS.BACKGROUND.TOP);
         gradient.addColorStop(0.5, CONFIG.COLORS.BACKGROUND.MID);
         gradient.addColorStop(1, CONFIG.COLORS.BACKGROUND.BOTTOM);
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, width, height);
         ctx.restore();
     }
 }
@@ -254,11 +255,12 @@ export class Nebula {
      * Initializes nebula configurations for rendering.
      * Generates an array of nebula objects with randomized position, radius, and color properties.
      *
-     * @param {HTMLCanvasElement} canvas - The canvas element used to determine nebula positions and sizes.
+     * @param {number} width - Canvas width in logical pixels.
+     * @param {number} height - Canvas height in logical pixels.
      * @param {boolean} isMobile - Indicates if the rendering is for a mobile device, affecting nebula count and size.
-     * @returns {Array<Object>} Array of nebula configuration objects, each containing x, y, r, color0, and color1.
+     * @returns {NebulaConfig[]} Array of nebula configuration objects, each containing x, y, r, color0, and color1.
      */
-    static init(canvas, isMobile) {
+    static init(width, height, isMobile) {
         const nebulaColors = [
             { color0: CONFIG.COLORS.NEBULA.N1, color1: CONFIG.COLORS.NEBULA.N1_OUT },
             { color0: CONFIG.COLORS.NEBULA.N2, color1: CONFIG.COLORS.NEBULA.N2_OUT },
@@ -293,8 +295,8 @@ export class Nebula {
                 };
             });
             return {
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
+                x: Math.random() * width,
+                y: Math.random() * height,
                 r: baseR,
                 color0: colorSet.color0,
                 color1: colorSet.color1,
@@ -308,11 +310,12 @@ export class Nebula {
     }
     /**
      * Animates nebula by updating position and radius over time.
-     * @param {HTMLCanvasElement} canvas - The canvas element for bounds.
-     * @param {Array<Object>} nebulaConfigs - Array of nebula configuration objects.
+     * @param {number} width - Canvas width in logical pixels.
+     * @param {number} height - Canvas height in logical pixels.
+     * @param {NebulaConfig[]} nebulaConfigs - Array of nebula configuration objects.
      * @param {boolean} isMobile - Indicates if the rendering is for a mobile device, affecting nebula count and size.
      */
-    static update(canvas, nebulaConfigs, isMobile) {
+    static update(width, height, nebulaConfigs, isMobile) {
         for (const nebula of nebulaConfigs) {
             nebula.x += nebula.dx;
             nebula.y += nebula.dy;
@@ -320,8 +323,8 @@ export class Nebula {
             nebula.t += 1;
             const radiusMin = isMobile ? CONFIG.NEBULA.RADIUS_MIN_MOBILE : CONFIG.NEBULA.RADIUS_MIN_DESKTOP;
             const radiusMax = isMobile ? CONFIG.NEBULA.RADIUS_MAX_MOBILE : CONFIG.NEBULA.RADIUS_MAX_DESKTOP;
-            if (nebula.x < 0 || nebula.x > canvas.width) nebula.dx *= -1;
-            if (nebula.y < 0 || nebula.y > canvas.height) nebula.dy *= -1;
+            if (nebula.x < 0 || nebula.x > width) nebula.dx *= -1;
+            if (nebula.y < 0 || nebula.y > height) nebula.dy *= -1;
             if (nebula.r < radiusMin || nebula.r > radiusMax) nebula.dr *= -1;
             if (nebula.blobs) {
                 for (let i = 0; i < nebula.blobs.length; i++) {
@@ -340,10 +343,9 @@ export class Nebula {
      * Each nebula is rendered as a radial gradient at its specified position and radius.
      *
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     * @param {HTMLCanvasElement} canvas - The canvas element.
-     * @param {Array<Object>} nebulaConfigs - Array of nebula configuration objects from Nebula.init().
+     * @param {NebulaConfig[]} nebulaConfigs - Array of nebula configuration objects from Nebula.init().
      */
-    static draw(ctx, canvas, nebulaConfigs) {
+    static draw(ctx, nebulaConfigs) {
         ctx.save();
         for (const nebula of nebulaConfigs) {
             const blobs = nebula.blobs || [{
@@ -442,7 +444,7 @@ export class Player {
     }
     /**
      * Updates the player's position based on input or mouse position.
-     * @param {Object} input - The input state.
+     * @param {InputState} input - The input state (keyboard map).
      * @param {{x: number, y: number}} mousePos - The mouse position (CSS pixels).
      * @param {{width: number, height: number}} view - The logical viewport dimensions.
      */
@@ -598,13 +600,14 @@ export class Star {
 export class StarField {
     /**
      * Initializes the star field array.
-     * @param {HTMLCanvasElement} canvas - The canvas element.
-     * @returns {Array<Object>} Array of star objects.
+     * @param {number} width - Canvas width in logical pixels.
+     * @param {number} height - Canvas height in logical pixels.
+     * @returns {StarData[]} Array of star objects.
      */
-    static init(canvas) {
+    static init(width, height) {
         return Array.from({ length: CONFIG.GAME.STARFIELD_COUNT }, () => ({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
+            x: Math.random() * width,
+            y: Math.random() * height,
             size: Math.random() * 2 + 0.5,
             speed: Math.random() * 0.5 + 0.1,
             brightness: Math.random() * 0.5 + 0.5
@@ -613,18 +616,19 @@ export class StarField {
     /**
      * Draws the star field on the canvas.
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     * @param {HTMLCanvasElement} canvas - The canvas element.
-     * @param {Array<Object>} starField - Array of star objects.
+     * @param {number} width - Canvas width in logical pixels.
+     * @param {number} height - Canvas height in logical pixels.
+     * @param {StarData[]} starField - Array of star objects.
      * @param {number} time - The current time for animation.
      */
-    static draw(ctx, canvas, starField, time) {
+    static draw(ctx, width, height, starField, time) {
         ctx.save();
         ctx.fillStyle = CONFIG.COLORS.STAR.GRAD_IN;
         starField.forEach(star => {
             star.y += star.speed;
-            if (star.y > canvas.height) {
+            if (star.y > height) {
                 star.y = -5;
-                star.x = Math.random() * canvas.width;
+                star.x = Math.random() * width;
             }
             const twinkle = Math.sin(time * 0.01 + star.x) * 0.3 + 0.7;
             ctx.save();
