@@ -24,7 +24,7 @@ Because `index.html` loads ES modules (`type="module"`), the game must run from 
 
 - Move: Arrow keys or WASD, or guide with mouse/touch
 - Shoot: Space, mouse click, or tap
-- Score: +20 per star, +10 per asteroid
+- Score: +10 per asteroid, +20 per star
 - Game over: Collide with an asteroid
 - Restart: Click “Launch Mission” or “Play Again”
 

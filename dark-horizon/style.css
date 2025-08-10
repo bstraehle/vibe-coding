@@ -128,19 +128,19 @@ body {
     padding: var(--space-3) var(--space-6);
     transition: background 0.2s ease, transform 0.1s ease, outline-color 0.2s ease;
 }
-.action-button:hover {
-    background: var(--btn-bg-hover);
-}
-.action-button:focus-visible {
-    outline: 2px solid var(--color-btn-focus-outline);
-    outline-offset: 2px;
-}
 .action-button:active {
     transform: translateY(1px);
 }
 .action-button:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+}
+.action-button:focus-visible {
+    outline: 2px solid var(--color-btn-focus-outline);
+    outline-offset: 2px;
+}
+.action-button:hover {
+    background: var(--btn-bg-hover);
 }
 .game-over-screen {
     align-items: center;
@@ -179,11 +179,14 @@ body {
 }
 
 @media (max-width: 480px) {
+    .game-header {
+        position: fixed;
+    }
     .score {
         padding: 6px 10px;
     }
-    .game-header {
-        position: fixed;
+    .instructions {
+        font-size: clamp(0.9rem, 1vw + 0.7rem, 1.1rem);
     }
 }
 
