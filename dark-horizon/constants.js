@@ -14,67 +14,73 @@
  * @property {Object} SPEEDS - Speed settings for entities.
  * @property {Object} STAR - Star properties.
  */
-export const CONFIG = deepFreeze({
-    COLORS: {
-        ASTEROID: {
-            GRAD_IN: '#666',
-            GRAD_MID: '#444',
-            GRAD_OUT: '#222',
-            CRATER: '#444',
-            OUTLINE: '#222'
-        },
-        BACKGROUND: {
-            TOP: '#000',
-            MID: '#222',
-            BOTTOM: '#444'
-        },
-        BULLET: {
-            SHADOW: '#ff6b6b',
-            GRAD_TOP: '#ff6b6b',
-            GRAD_MID: '#ff8e8e',
-            GRAD_BOTTOM: '#ff4444',
-            TRAIL: 'rgba(255, 107, 107, 0.5)'
-        },
-        ENGINE: {
-            GLOW1: 'rgba(255, 100, 100, 0.8)',
-            GLOW2: 'rgba(255, 150, 100, 0.4)',
-            GLOW3: 'rgba(255, 200, 100, 0)'
-        },
-        EXPLOSION: {
-            GRAD_IN: 'rgba(255, 255, 255, ', // alpha appended
-            GRAD_MID1: 'rgba(255, 200, 100, ', // alpha appended
-            GRAD_MID2: 'rgba(255, 100, 50, ', // alpha appended
-            GRAD_OUT: 'rgba(255, 50, 0, 0)'
-        },
-        NEBULA: {
-            N1: 'rgba(80, 130, 255, 0.1)',
-            N2: 'rgba(255, 100, 100, 0.1)',
-            N3: 'rgba(255, 200, 100, 0.1)',
-            N4: 'rgba(180, 80, 255, 0.1)',
-            N1_OUT: 'rgba(80, 130, 255, 0)',
-            N2_OUT: 'rgba(255, 100, 100, 0)',
-            N3_OUT: 'rgba(255, 200, 100, 0)',
-            N4_OUT: 'rgba(180, 80, 255, 0)'
-        },
-        PLAYER: {
-            GRAD_TOP: '#000',
-            GRAD_MID: '#ddd',
-            GRAD_BOTTOM: '#fff',
-            OUTLINE: '#bbb',
-            COCKPIT: '#b20000',
-            GUN: '#b20000',
-            SHADOW: '#000'
-        },
-        STAR: {
-            BASE: '#ffd700',
-            GRAD_IN: '#ffffff',
-            GRAD_MID: '#ffd700',
-            GRAD_OUT: '#ffa500'
-        }
+const COLORS = deepFreeze({
+    ASTEROID: {
+        GRAD_IN: '#666',
+        GRAD_MID: '#444',
+        GRAD_OUT: '#333',
+        CRATER: '#555',
+        OUTLINE: '#444'
     },
+    BACKGROUND: {
+        TOP: '#000',
+        MID: '#222',
+        BOTTOM: '#444'
+    },
+    BULLET: {
+        SHADOW: '#ff6b6b',
+        GRAD_TOP: '#ff6b6b',
+        GRAD_MID: '#ff8e8e',
+        GRAD_BOTTOM: '#ff4444',
+        TRAIL: 'rgba(255, 107, 107, 0.5)'
+    },
+    ENGINE: {
+        GLOW1: 'rgba(255, 100, 100, 0.8)',
+        GLOW2: 'rgba(255, 150, 100, 0.4)',
+        GLOW3: 'rgba(255, 200, 100, 0)'
+    },
+    EXPLOSION: {
+        GRAD_IN: 'rgba(255, 255, 255, ', // alpha appended
+        GRAD_MID1: 'rgba(255, 200, 100, ', // alpha appended
+        GRAD_MID2: 'rgba(255, 100, 50, ', // alpha appended
+        GRAD_OUT: 'rgba(255, 50, 0, 0)'
+    },
+    NEBULA: {
+        N1: 'rgba(80, 130, 255, 0.1)',
+        N2: 'rgba(255, 100, 100, 0.1)',
+        N3: 'rgba(255, 200, 100, 0.1)',
+        N4: 'rgba(180, 80, 255, 0.1)',
+        N1_OUT: 'rgba(80, 130, 255, 0)',
+        N2_OUT: 'rgba(255, 100, 100, 0)',
+        N3_OUT: 'rgba(255, 200, 100, 0)',
+        N4_OUT: 'rgba(180, 80, 255, 0)'
+    },
+    PLAYER: {
+        GRAD_TOP: '#000',
+        GRAD_MID: '#ddd',
+        GRAD_BOTTOM: '#fff',
+        OUTLINE: '#bbb',
+        COCKPIT: '#b20000',
+        GUN: '#b20000',
+        SHADOW: '#000'
+    },
+    STAR: {
+        BASE: '#ffd700',
+        GRAD_IN: '#ffffff',
+        GRAD_MID: '#ffd700',
+        GRAD_OUT: '#ffa500'
+    },
+    UI: {
+        OVERLAY_BACKDROP: 'rgba(0,0,0,0.5)',
+        OVERLAY_TEXT: '#fff'
+    }
+});
+
+export const CONFIG = deepFreeze({
+    COLORS: COLORS,
     ASTEROID: {
         MIN_SIZE: 25,
-        SIZE_VARIATION: 25,
+        SIZE_VARIATION: 50,
         SPAWN_Y: -40,
         HORIZONTAL_MARGIN: 40,
         SPEED_VARIATION: 2
@@ -124,13 +130,23 @@ export const CONFIG = deepFreeze({
     },
     STAR: {
         MIN_SIZE: 15,
-        SIZE_VARIATION: 15,
+        SIZE_VARIATION: 30,
         SPAWN_Y: -20,
         HORIZONTAL_MARGIN: 20,
         PARTICLE_BURST: 12,
         PARTICLE_LIFE: 20,
         PARTICLE_SIZE_MIN: 1,
         PARTICLE_SIZE_VARIATION: 2
+    },
+    UI: {
+        PAUSE_OVERLAY: {
+            BACKDROP: COLORS.UI.OVERLAY_BACKDROP,
+            FONT: 'bold 28px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+            MESSAGE: 'Paused - use ESC to resume',
+            TEXT_ALIGN: 'center',
+            TEXT_BASELINE: 'middle',
+            TEXT_COLOR: COLORS.UI.OVERLAY_TEXT
+        }
     }
 });
 

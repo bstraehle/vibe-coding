@@ -443,10 +443,10 @@ export class Player {
     /**
      * Updates the player's position based on input or mouse position.
      * @param {Object} input - The input state.
-     * @param {{x: number, y: number}} mousePos - The mouse position.
-     * @param {HTMLCanvasElement} canvas - The canvas element.
+     * @param {{x: number, y: number}} mousePos - The mouse position (CSS pixels).
+     * @param {{width: number, height: number}} view - The logical viewport dimensions.
      */
-    update(input, mousePos, canvas) {
+    update(input, mousePos, view) {
         const keyboardPressed = input['ArrowLeft'] || input['KeyA'] ||
             input['ArrowRight'] || input['KeyD'] ||
             input['ArrowUp'] || input['KeyW'] ||
@@ -462,8 +462,8 @@ export class Player {
             this.x += (targetX - this.x) * 0.1;
             this.y += (targetY - this.y) * 0.1;
         }
-        this.x = clamp(this.x, 0, canvas.width - this.width);
-        this.y = clamp(this.y, 0, canvas.height - this.height);
+        this.x = clamp(this.x, 0, view.width - this.width);
+        this.y = clamp(this.y, 0, view.height - this.height);
     }
     /**
      * Draws the player ship on the canvas.
@@ -500,9 +500,6 @@ export class Player {
         ctx.fill();
         ctx.fillStyle = CONFIG.COLORS.PLAYER.GUN;
         ctx.fillRect(centerX - 2, this.y - 8, 4, 10);
-        ctx.shadowColor = CONFIG.COLORS.PLAYER.SHADOW;
-        ctx.shadowBlur = 12;
-        ctx.stroke();
         ctx.restore();
     }
     /**

@@ -21,12 +21,17 @@ class DarkHorizon {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
+        this.view = { width: 0, height: 0, dpr: 1 };
         this.gameInfo = document.getElementById('gameInfo');
         this.gameOverScreen = document.getElementById('gameOverScreen');
         this.startBtn = document.getElementById('startBtn');
         this.restartBtn = document.getElementById('restartBtn');
 
-        this.highScore = Number(localStorage.getItem('darkHorizonHighScore')) || 0;
+        try {
+            this.highScore = Number(localStorage.getItem('darkHorizonHighScore')) || 0;
+        } catch (_) {
+            this.highScore = 0;
+        }
         this.score = 0;
         this.updateHighScore();
 
@@ -43,6 +48,7 @@ class DarkHorizon {
         this.shotCooldown = CONFIG.GAME.SHOT_COOLDOWN;
 
         this.gameRunning = false;
+        this.paused = false;
 
         this.time = 0;
 
@@ -114,14 +120,26 @@ class DarkHorizon {
         this.canvas.addEventListener('mousemove', this.handleMouseMove);
         this.canvas.addEventListener('click', this.shoot);
         // Touch events for mobile
-        this.canvas.addEventListener('touchmove', this.handleTouchMove);
-        this.canvas.addEventListener('touchstart', this.handleTouchStart);
+        this.canvas.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+        this.canvas.addEventListener('touchstart', this.handleTouchStart, { passive: false });
         // Button events
         this.startBtn.addEventListener('click', this.handleStartClick);
         this.restartBtn.addEventListener('click', this.handleRestartClick);
         // Keyboard accessibility for buttons
         this.startBtn.addEventListener('keydown', this.handleStartKeyDown);
         this.restartBtn.addEventListener('keydown', this.handleRestartKeyDown);
+        // Pause toggle
+        window.addEventListener('keydown', (e) => {
+            if ((e.code === 'Escape' || e.key === 'Escape' || e.key === 'Esc') && this.gameRunning && !e.repeat) {
+                e.preventDefault();
+                this.togglePause();
+                return;
+            }
+            if (this.paused && this.gameRunning && !e.repeat && (e.code === 'Enter' || e.code === 'Space')) {
+                e.preventDefault();
+                this.togglePause();
+            }
+        });
     }
 
     /**
@@ -226,7 +244,7 @@ class DarkHorizon {
      * Fire a bullet if cooldown allows.
      */
     shoot() {
-    if (!this.gameRunning) return;
+    if (!this.gameRunning || this.paused) return;
         const now = Date.now();
         if (now - this.lastShot < this.shotCooldown) return;
         this.bullets.push(this.createBullet());
@@ -237,10 +255,17 @@ class DarkHorizon {
      * Resize the game canvas and reposition the player.
      */
     resizeCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.player.x = this.canvas.width / 2 - this.player.width / 2;
-        this.player.y = this.canvas.height - this.player.height - CONFIG.PLAYER.SPAWN_Y_OFFSET;
+        const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+        this.view.dpr = dpr;
+        this.view.width = Math.floor(window.innerWidth);
+        this.view.height = Math.floor(window.innerHeight);
+        this.canvas.style.width = this.view.width + 'px';
+        this.canvas.style.height = this.view.height + 'px';
+        this.canvas.width = Math.floor(this.view.width * dpr);
+        this.canvas.height = Math.floor(this.view.height * dpr);
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.player.x = this.view.width / 2 - this.player.width / 2;
+        this.player.y = this.view.height - this.player.height - CONFIG.PLAYER.SPAWN_Y_OFFSET;
     }
 
     /**
@@ -248,8 +273,8 @@ class DarkHorizon {
      */
     handleResize() {
         if (this._resizeScheduled) return;
-        this._resizeScheduled = true;
-        requestAnimationFrame(() => {
+            this._resizeScheduled = true;
+            requestAnimationFrame(() => {
             this._resizeScheduled = false;
             this.resizeCanvas();
             this.initBackground();
@@ -290,9 +315,18 @@ class DarkHorizon {
     gameLoop() {
         if (!this.gameRunning) return;
         this.time++;
-        this.update();
+        if (!this.paused) {
+            this.update();
+        }
         this.draw();
         requestAnimationFrame(() => this.gameLoop());
+    }
+
+    /**
+     * Toggle pause state.
+     */
+    togglePause() {
+        this.paused = !this.paused;
     }
 
     /**
@@ -300,6 +334,7 @@ class DarkHorizon {
      */
     gameOver() {
         this.gameRunning = false;
+        this.paused = false;
         this.updateHighScore();
         this.showGameOver();
     }
@@ -342,7 +377,11 @@ class DarkHorizon {
     updateHighScore() {
         if (this.score > this.highScore) {
             this.highScore = this.score;
-            localStorage.setItem('darkHorizonHighScore', this.highScore);
+            try {
+                localStorage.setItem('darkHorizonHighScore', this.highScore);
+            } catch (_) {
+                // ignore storage errors (e.g., privacy mode)
+            }
         }
         document.getElementById('highScore').textContent = this.highScore;
     }
@@ -362,7 +401,7 @@ class DarkHorizon {
         this.updateStars();
         this.spawnObjects();
         this.checkCollisions();
-        this.player.update(this.keys, this.mousePos, this.canvas);
+        this.player.update(this.keys, this.mousePos, this.view);
     }
 
     /**
@@ -372,7 +411,7 @@ class DarkHorizon {
         for (let i = this.asteroids.length - 1; i >= 0; i--) {
             const asteroid = this.asteroids[i];
             asteroid.update();
-            if (asteroid.y > this.canvas.height) {
+            if (asteroid.y > this.view.height) {
                 this.asteroids.splice(i, 1);
             }
         }
@@ -434,7 +473,7 @@ class DarkHorizon {
         for (let i = this.stars.length - 1; i >= 0; i--) {
             const star = this.stars[i];
             star.update();
-            if (star.y > this.canvas.height) {
+            if (star.y > this.view.height) {
                 this.stars.splice(i, 1);
             }
         }
@@ -519,13 +558,10 @@ class DarkHorizon {
         const width = CONFIG.ASTEROID.MIN_SIZE + Math.random() * CONFIG.ASTEROID.SIZE_VARIATION;
         const height = CONFIG.ASTEROID.MIN_SIZE + Math.random() * CONFIG.ASTEROID.SIZE_VARIATION;
         const speed = this.asteroidSpeed + Math.random() * CONFIG.ASTEROID.SPEED_VARIATION;
-        return new Asteroid(
-            Math.random() * (this.canvas.width - CONFIG.ASTEROID.HORIZONTAL_MARGIN),
-            CONFIG.ASTEROID.SPAWN_Y,
-            width,
-            height,
-            speed
-        );
+        const minX = CONFIG.ASTEROID.HORIZONTAL_MARGIN / 2;
+        const maxX = Math.max(minX, this.view.width - width - CONFIG.ASTEROID.HORIZONTAL_MARGIN / 2);
+        const x = minX + Math.random() * (maxX - minX);
+        return new Asteroid(x, CONFIG.ASTEROID.SPAWN_Y, width, height, speed);
     }
 
     /**
@@ -533,13 +569,8 @@ class DarkHorizon {
      * @returns {Bullet} A new bullet instance.
      */
     createBullet() {
-        return new Bullet(
-            this.player.x + this.player.width / 2 + CONFIG.BULLET.SPAWN_OFFSET,
-            this.player.y,
-            CONFIG.BULLET.WIDTH,
-            CONFIG.BULLET.HEIGHT,
-            this.bulletSpeed
-        );
+        const bx = this.player.x + (this.player.width - CONFIG.BULLET.WIDTH) / 2 + CONFIG.BULLET.SPAWN_OFFSET;
+        return new Bullet(bx, this.player.y, CONFIG.BULLET.WIDTH, CONFIG.BULLET.HEIGHT, this.bulletSpeed);
     }
 
     /**
@@ -578,13 +609,10 @@ class DarkHorizon {
         const width = CONFIG.STAR.MIN_SIZE + Math.random() * CONFIG.STAR.SIZE_VARIATION;
         const height = CONFIG.STAR.MIN_SIZE + Math.random() * CONFIG.STAR.SIZE_VARIATION;
         const speed = this.starSpeed + Math.random();
-        return new Star(
-            Math.random() * (this.canvas.width - CONFIG.STAR.HORIZONTAL_MARGIN),
-            CONFIG.STAR.SPAWN_Y,
-            width,
-            height,
-            speed
-        );
+        const minX = CONFIG.STAR.HORIZONTAL_MARGIN / 2;
+        const maxX = Math.max(minX, this.view.width - width - CONFIG.STAR.HORIZONTAL_MARGIN / 2);
+        const x = minX + Math.random() * (maxX - minX);
+        return new Star(x, CONFIG.STAR.SPAWN_Y, width, height, speed);
     }
 
     /**
@@ -605,7 +633,7 @@ class DarkHorizon {
      * Init the background.
      */
     initBackground() {
-        if (this.gameRunning) {
+    if (this.gameRunning) {
             this.nebulaConfigs = Nebula.init(this.canvas, this._isMobile);
         }
         this.starField = StarField.init(this.canvas);
@@ -620,6 +648,17 @@ class DarkHorizon {
             Nebula.draw(this.ctx, this.canvas, this.nebulaConfigs);
         }
         StarField.draw(this.ctx, this.canvas, this.starField, this.time);
+        if (this.gameRunning && this.paused) {
+            this.ctx.save();
+            this.ctx.fillStyle = CONFIG.UI.PAUSE_OVERLAY.BACKDROP;
+            this.ctx.fillRect(0, 0, this.view.width, this.view.height);
+            this.ctx.fillStyle = CONFIG.UI.PAUSE_OVERLAY.TEXT_COLOR;
+            this.ctx.font = CONFIG.UI.PAUSE_OVERLAY.FONT;
+            this.ctx.textAlign = CONFIG.UI.PAUSE_OVERLAY.TEXT_ALIGN;
+            this.ctx.textBaseline = CONFIG.UI.PAUSE_OVERLAY.TEXT_BASELINE;
+            this.ctx.fillText(CONFIG.UI.PAUSE_OVERLAY.MESSAGE, this.view.width / 2, this.view.height / 2);
+            this.ctx.restore();
+        }
     }
 
     /**

@@ -47,6 +47,7 @@ body {
     display: block;
     height: 100%;
     width: 100%;
+    touch-action: none;
 }
 .game-container {
     display: flex;
@@ -196,6 +197,15 @@ body {
     .mobile-only { display: block; }
 }
 
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        scroll-behavior: auto !important;
+        transition: none !important;
+    }
+}
+
 /* Accessibility utilities */
 .sr-only {
     border: 0;
@@ -207,13 +217,4 @@ body {
     position: absolute;
     white-space: nowrap;
     width: 1px;
-}
-
-/* Respect user motion preferences */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        scroll-behavior: auto !important;
-        transition: none !important;
-    }
 }
