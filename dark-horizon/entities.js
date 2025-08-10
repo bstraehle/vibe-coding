@@ -1,5 +1,9 @@
 import { CONFIG } from './constants.js';
 
+// Small local utilities to keep math consistent and readable
+const PI2 = Math.PI * 2;
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
 /**
  * Represents an asteroid obstacle in the game world, managing its position, movement, and visual appearance.
  */
@@ -18,6 +22,15 @@ export class Asteroid {
         this.width = width;
         this.height = height;
         this.speed = speed;
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const radius = this.width / 2;
+        const craterCount = 3;
+        this._craters = Array.from({ length: craterCount }, () => ({
+            dx: (Math.random() - 0.5) * radius * 0.8,
+            dy: (Math.random() - 0.5) * radius * 0.8,
+            r: Math.random() * radius * 0.3 + 2
+        }));
     }
     /**
      * Updates the asteroid's position.
@@ -30,6 +43,7 @@ export class Asteroid {
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
+        ctx.save();
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
         const radius = this.width / 2;
@@ -39,20 +53,18 @@ export class Asteroid {
         asteroidGradient.addColorStop(1, CONFIG.COLORS.ASTEROID.GRAD_OUT);
         ctx.fillStyle = asteroidGradient;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, radius, 0, PI2);
         ctx.fill();
         ctx.fillStyle = CONFIG.COLORS.ASTEROID.CRATER;
-        for (let i = 0; i < 3; i++) {
-            const craterX = centerX + (Math.random() - 0.5) * radius * 0.8;
-            const craterY = centerY + (Math.random() - 0.5) * radius * 0.8;
-            const craterSize = Math.random() * radius * 0.3 + 2;
+        for (const c of this._craters) {
             ctx.beginPath();
-            ctx.arc(craterX, craterY, craterSize, 0, Math.PI * 2);
+            ctx.arc(centerX + c.dx, centerY + c.dy, c.r, 0, PI2);
             ctx.fill();
         }
         ctx.strokeStyle = CONFIG.COLORS.ASTEROID.OUTLINE;
         ctx.lineWidth = 2;
         ctx.stroke();
+        ctx.restore();
     }
 }
 
@@ -66,12 +78,14 @@ export class Background {
      * @param {HTMLCanvasElement} canvas - The canvas element.
      */
     static draw(ctx, canvas) {
+        ctx.save();
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, CONFIG.COLORS.BACKGROUND.TOP);
         gradient.addColorStop(0.5, CONFIG.COLORS.BACKGROUND.MID);
         gradient.addColorStop(1, CONFIG.COLORS.BACKGROUND.BOTTOM);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
     }
 }
 
@@ -105,7 +119,8 @@ export class Bullet {
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
-    ctx.shadowColor = CONFIG.COLORS.BULLET.SHADOW;
+        ctx.save();
+        ctx.shadowColor = CONFIG.COLORS.BULLET.SHADOW;
         ctx.shadowBlur = 8;
         const bulletGradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
         bulletGradient.addColorStop(0, CONFIG.COLORS.BULLET.GRAD_TOP);
@@ -115,7 +130,7 @@ export class Bullet {
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = CONFIG.COLORS.BULLET.TRAIL;
         ctx.fillRect(this.x, this.y + this.height, this.width, 10);
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
 }
 
@@ -158,6 +173,7 @@ export class EngineTrail {
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
+        ctx.save();
         this.particles.forEach(particle => {
             const alpha = particle.life / 20;
             ctx.globalAlpha = alpha;
@@ -169,10 +185,10 @@ export class EngineTrail {
             trailGradient.addColorStop(1, CONFIG.COLORS.ENGINE.GLOW3);
             ctx.fillStyle = trailGradient;
             ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+            ctx.arc(particle.x, particle.y, particle.size * 2, 0, PI2);
             ctx.fill();
         });
-        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 }
 
@@ -208,25 +224,22 @@ export class Explosion {
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
+        ctx.save();
         const alpha = this.life / this.maxLife;
         const scale = 1 + (1 - alpha) * 2;
-        const explosionGradient = ctx.createRadialGradient(
-            this.x + this.width / 2, this.y + this.height / 2, 0,
-            this.x + this.width / 2, this.y + this.height / 2, this.width / 2 * scale
-        );
+        const cx = this.x + this.width / 2;
+        const cy = this.y + this.height / 2;
+        const r = (this.width / 2) * scale;
+        const explosionGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
         explosionGradient.addColorStop(0, `${CONFIG.COLORS.EXPLOSION.GRAD_IN}${alpha})`);
         explosionGradient.addColorStop(0.3, `${CONFIG.COLORS.EXPLOSION.GRAD_MID1}${alpha * 0.8})`);
         explosionGradient.addColorStop(0.7, `${CONFIG.COLORS.EXPLOSION.GRAD_MID2}${alpha * 0.6})`);
         explosionGradient.addColorStop(1, CONFIG.COLORS.EXPLOSION.GRAD_OUT);
         ctx.fillStyle = explosionGradient;
         ctx.beginPath();
-        ctx.arc(
-            this.x + this.width / 2,
-            this.y + this.height / 2,
-            this.width / 2 * scale,
-            0, Math.PI * 2
-        );
+        ctx.arc(cx, cy, r, 0, PI2);
         ctx.fill();
+        ctx.restore();
     }
 }
 
@@ -347,7 +360,7 @@ export class Nebula {
                 ctx.fillStyle = grad;
                 ctx.globalCompositeOperation = 'lighter';
                 ctx.beginPath();
-                ctx.arc(0, 0, b.r || nebula.r, 0, Math.PI * 2);
+                ctx.arc(0, 0, b.r || nebula.r, 0, PI2);
                 ctx.fill();
                 ctx.restore();
             }
@@ -395,16 +408,16 @@ export class Particle {
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
+        ctx.save();
         const alpha = this.life / this.maxLife;
         ctx.globalAlpha = alpha;
         ctx.shadowColor = this.color;
         ctx.shadowBlur = this.size;
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.size, 0, PI2);
         ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 }
 
@@ -449,14 +462,15 @@ export class Player {
             this.x += (targetX - this.x) * 0.1;
             this.y += (targetY - this.y) * 0.1;
         }
-        this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
-        this.y = Math.max(0, Math.min(canvas.height - this.height, this.y));
+        this.x = clamp(this.x, 0, canvas.width - this.width);
+        this.y = clamp(this.y, 0, canvas.height - this.height);
     }
     /**
      * Draws the player ship on the canvas.
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
      */
     draw(ctx) {
+        ctx.save();
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
         Player.drawEngineGlow(ctx, centerX, this.y + this.height);
@@ -482,14 +496,14 @@ export class Player {
         ctx.stroke();
         ctx.fillStyle = CONFIG.COLORS.PLAYER.COCKPIT;
         ctx.beginPath();
-        ctx.ellipse(centerX, this.y + this.height * 0.32, 4, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, this.y + this.height * 0.32, 4, 3, 0, 0, PI2);
         ctx.fill();
         ctx.fillStyle = CONFIG.COLORS.PLAYER.GUN;
         ctx.fillRect(centerX - 2, this.y - 8, 4, 10);
         ctx.shadowColor = CONFIG.COLORS.PLAYER.SHADOW;
         ctx.shadowBlur = 12;
         ctx.stroke();
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
     /**
      * Draws the engine glow for the player ship.
@@ -498,12 +512,14 @@ export class Player {
      * @param {number} y - The y position for the glow.
      */
     static drawEngineGlow(ctx, x, y) {
+        ctx.save();
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
         gradient.addColorStop(0, CONFIG.COLORS.ENGINE.GLOW1);
         gradient.addColorStop(0.5, CONFIG.COLORS.ENGINE.GLOW2);
         gradient.addColorStop(1, CONFIG.COLORS.ENGINE.GLOW3);
         ctx.fillStyle = gradient;
         ctx.fillRect(x - 20, y, 40, 30);
+        ctx.restore();
     }
 }
 
@@ -538,6 +554,7 @@ export class Star {
      * @param {number} time - The current time for animation.
      */
     draw(ctx, time) {
+        ctx.save();
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
         const size = this.width / 2;
@@ -551,7 +568,7 @@ export class Star {
         starGradient.addColorStop(1, CONFIG.COLORS.STAR.GRAD_OUT);
         ctx.fillStyle = starGradient;
         Star.drawStar(ctx, centerX, centerY, scaledSize);
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
     /**
      * Draws a star shape.
@@ -604,6 +621,7 @@ export class StarField {
      * @param {number} time - The current time for animation.
      */
     static draw(ctx, canvas, starField, time) {
+        ctx.save();
         ctx.fillStyle = CONFIG.COLORS.STAR.GRAD_IN;
         starField.forEach(star => {
             star.y += star.speed;
@@ -612,12 +630,13 @@ export class StarField {
                 star.x = Math.random() * canvas.width;
             }
             const twinkle = Math.sin(time * 0.01 + star.x) * 0.3 + 0.7;
+            ctx.save();
             ctx.globalAlpha = star.brightness * twinkle;
             ctx.shadowColor = CONFIG.COLORS.STAR.GRAD_IN;
             ctx.shadowBlur = star.size * 2;
             ctx.fillRect(star.x, star.y, star.size, star.size);
-            ctx.shadowBlur = 0;
+            ctx.restore();
         });
-        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 }

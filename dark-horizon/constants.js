@@ -1,8 +1,9 @@
 /**
  * Dark Horizon game configuration constants.
+ * The exported object is deeply frozen to prevent accidental mutation at runtime.
  *
  * @constant
- * @type {Object}
+ * @type {Readonly<object>}
  * @property {Object} COLORS - Color definitions for game elements.
  * @property {Object} ASTEROID - Asteroid properties.
  * @property {Object} BULLET - Bullet properties.
@@ -13,7 +14,7 @@
  * @property {Object} SPEEDS - Speed settings for entities.
  * @property {Object} STAR - Star properties.
  */
-export const CONFIG = {
+export const CONFIG = deepFreeze({
     COLORS: {
         ASTEROID: {
             GRAD_IN: '#666',
@@ -96,7 +97,9 @@ export const CONFIG = {
         SHOT_COOLDOWN: 200,
         STARFIELD_COUNT: 150,
         ASTEROID_SPAWN_RATE: 0.02,
-        STAR_SPAWN_RATE: 0.01
+        STAR_SPAWN_RATE: 0.01,
+        STAR_SCORE: 20,
+        ASTEROID_SCORE: 10
     },
     NEBULA: {
         COUNT_DESKTOP: 8,
@@ -129,4 +132,23 @@ export const CONFIG = {
         PARTICLE_SIZE_MIN: 1,
         PARTICLE_SIZE_VARIATION: 2
     }
-};
+});
+
+/**
+ * Deeply freezes an object to make it immutable at all nested levels.
+ * Note: Only freezes plain objects/arrays; primitives are ignored by Object.freeze.
+ * @param {any} obj
+ * @returns {any} The same object, deeply frozen
+ */
+function deepFreeze(obj) {
+    if (obj && typeof obj === 'object' && !Object.isFrozen(obj)) {
+        Object.getOwnPropertyNames(obj).forEach((prop) => {
+            const value = obj[prop];
+            if (value && typeof value === 'object') {
+                deepFreeze(value);
+            }
+        });
+        Object.freeze(obj);
+    }
+    return obj;
+}

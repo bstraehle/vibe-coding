@@ -1,4 +1,5 @@
 :root {
+    /* Colors */
     --color-bg: #111;
     --color-border: #333;
     --color-text: #fff;
@@ -9,6 +10,25 @@
     --color-btn-gradient-hover-start: #555;
     --color-btn-gradient-hover-end: #777;
     --color-btn-focus-outline: #b20000;
+
+    /* Spacing scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 40px;
+
+    /* Radii */
+    --radius-1: 4px;
+    --radius-2: 12px;
+    --radius-3: 20px;
+    --btn-radius: 999px;
+
+    /* Shared button backgrounds */
+    --btn-bg: linear-gradient(45deg, var(--color-btn-gradient-start), var(--color-btn-gradient-end));
+    --btn-bg-hover: linear-gradient(45deg, var(--color-btn-gradient-hover-start), var(--color-btn-gradient-hover-end));
 }
 * {
     box-sizing: border-box;
@@ -18,7 +38,7 @@
 body {
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-family: 'Arial', sans-serif;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     overflow: hidden;
     user-select: none;
 }
@@ -39,14 +59,12 @@ body {
 .game-header {
     backface-visibility: hidden;
     left: 0;
-    padding: 10px 20px;
-    position: absolute;
     right: 0;
     top: 0;
+    padding: var(--space-2) var(--space-5);
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
+    position: absolute;
     transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    -webkit-transform: translateZ(0);
-    will-change: transform;
     z-index: 999;
 }
 .score-display {
@@ -62,10 +80,10 @@ body {
 .score {
     background-color: var(--color-bg);
     border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border-radius: var(--radius-1);
     color: var(--color-text);
     display: inline-block;
-    padding: 4px 8px;
+    padding: var(--space-1) var(--space-2);
     position: relative;
 }
 .game-info {
@@ -73,81 +91,81 @@ body {
     background: var(--color-bg);
     bottom: 0;
     left: 0;
-    padding: 20px;
-    position: fixed;
     right: 0;
+    padding: var(--space-5);
+    padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+    position: fixed;
     transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    -webkit-transform: translateZ(0);
-    will-change: transform;
     z-index: 10;
 }
 .game-info h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: clamp(1.5rem, 3vw + 1rem, 2.5rem);
+    margin-bottom: var(--space-4);
     text-align: center;
     text-shadow: 0 0 20px var(--color-title-shadow);
 }
 .instructions {
-    font-size: 1.25em;
+    font-size: clamp(1rem, 1.2vw + 0.8rem, 1.25rem);
     text-align: center;
 }
 .instructions p {
     color: var(--color-text-secondary);
-    margin-bottom: 15px;
-}
-.compact-line {
-    line-height: 0.4;
+    margin-bottom: var(--space-4);
 }
 .action-button {
-    background: linear-gradient(45deg, var(--color-btn-gradient-start), var(--color-btn-gradient-end));
+    background: var(--btn-bg);
     border: none;
-    border-radius: 25px;
+    border-radius: var(--btn-radius);
     color: var(--color-text);
     cursor: pointer;
     display: block;
     font-size: 1rem;
     font-weight: bold;
+    min-height: 44px;
+    min-width: 44px;
     margin: 0 auto;
-    padding: 12px 24px;
-    transition: all 0.3s ease;
+    padding: var(--space-3) var(--space-6);
+    transition: background 0.2s ease, transform 0.1s ease, outline-color 0.2s ease;
 }
 .action-button:hover {
-    background: linear-gradient(45deg, var(--color-btn-gradient-hover-start), var(--color-btn-gradient-hover-end));
+    background: var(--btn-bg-hover);
 }
-.action-button:focus {
-    background: linear-gradient(45deg, var(--color-btn-gradient-hover-start), var(--color-btn-gradient-hover-end));
+.action-button:focus-visible {
     outline: 2px solid var(--color-btn-focus-outline);
     outline-offset: 2px;
+}
+.action-button:active {
+    transform: translateY(1px);
+}
+.action-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 .game-over-screen {
     align-items: center;
     display: flex;
-    height: 100%;
+    inset: 0;
     justify-content: center;
-    left: 0;
     position: fixed;
-    top: 0;
-    width: 100%;
     z-index: 100;
 }
 .game-over-content {
     background: var(--color-bg);
     border: 2px solid var(--color-border);
-    border-radius: 20px;
-    padding: 40px;
+    border-radius: var(--radius-3);
+    padding: var(--space-7);
     text-align: center;
 }
 .game-over-content h2 {
     color: var(--color-text);
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: clamp(1.5rem, 2.2vw + 1rem, 2.5rem);
+    margin-bottom: var(--space-6);
     text-shadow: 0 0 20px var(--color-title-shadow);
 }
 .game-over-content p {
     color: var(--color-text-secondary);
-    font-size: 1.5rem;
-    margin-bottom: 30px;
+    font-size: clamp(1.1rem, 1.2vw + 0.9rem, 1.5rem);
+    margin-bottom: var(--space-7);
 }
 .hidden {
     display: none !important;
@@ -159,44 +177,43 @@ body {
     display: none;
 }
 
-@media (max-width: 768px) {
-    .desktop-only {
-        display: none;
-    }
-    .mobile-only {
-        display: block;
-    }
-    .game-info h1 {
-        font-size: 2rem;
-    }
-    .instructions {
-        font-size: 1rem;
-    }
-    .game-over-content h2 {
-        font-size: 2rem;
-    }
-    .game-over-content p {
-        font-size: 1.2rem;
-    }
-    .action-button {
-        padding: 10px 20px;
-    }
-}
-
 @media (max-width: 480px) {
-    .game-info h1 {
-        font-size: 1.5rem;
-    }
     .score {
         padding: 6px 10px;
     }
     .game-header {
         position: fixed;
     }
-    .game-over-content h2 {
-        font-size: 1.5rem;
-    }
-    .action-button {
-        padding: 8px 16px;
+}
+
+/* Input-modality-based hints */
+@media (hover: hover) and (pointer: fine) {
+    .desktop-only { display: block; }
+    .mobile-only { display: none; }
+}
+@media (hover: none) and (pointer: coarse) {
+    .desktop-only { display: none; }
+    .mobile-only { display: block; }
+}
+
+/* Accessibility utilities */
+.sr-only {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        scroll-behavior: auto !important;
+        transition: none !important;
     }
 }

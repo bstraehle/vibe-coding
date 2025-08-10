@@ -5,37 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
+    <meta name="color-scheme" content="dark light">
+    <meta name="description" content="Dark Horizon: a fast-paced space arcade game. Collect stars, destroy asteroids, and chase a new high score on desktop or mobile.">
     <title>DARK HORIZON</title>
     <link rel="shortcut icon" href="favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <noscript>
+        <div class="noscript-warning" role="alert">This game requires JavaScript to run. Please enable JavaScript and reload.</div>
+    </noscript>
     <div class="game-container">
-        <div class="game-header">
-            <div class="score-display">
+        <header class="game-header">
+            <div class="score-display" aria-live="polite" aria-atomic="true">
                 <div class="score">High Score: <span id="highScore">0</span></div>
                 <div class="score">Score: <span id="currentScore">0</span></div>
             </div>
-        </div>
+        </header>
         
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" aria-label="Dark Horizon game field" role="img"></canvas>
         
-        <div id="gameInfo" class="game-info">
-            <h1>DARK HORIZON</h1>
+        <section id="gameInfo" class="game-info" role="region" aria-labelledby="gameTitle">
+            <h1 id="gameTitle">DARK HORIZON</h1>
             <div class="instructions">
-                <p class="compact-line">Collect stars (+20). Destroy asteroids (+10).</p>
-                <p class="desktop-only">Use ARROW keys or WASD to navigate. Use SPACE to shoot. Alternatively, use mouse click.</p>
+                <p>Collect stars (+20) and destroy asteroids (+10).</p>
+                <p class="desktop-only">Use ARROW keys or WASD to navigate and SPACE to shoot. Alternatively, use mouse click.</p>
                 <p class="mobile-only">Tap to navigate and shoot.</p>
             </div>
-            <button id="startBtn" class="action-button" tabindex="0" aria-label="Launch Mission">Launch Mission</button>
-        </div>
+            <button id="startBtn" class="action-button" type="button" tabindex="0" aria-label="Launch Mission">Launch Mission</button>
+        </section>
     </div>
     
-    <div id="gameOverScreen" class="game-over-screen hidden">
+    <div id="gameOverScreen" class="game-over-screen hidden" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle" aria-describedby="finalScore">
         <div class="game-over-content">
-            <h2>GAME OVER</h2>
+            <h2 id="gameOverTitle">GAME OVER</h2>
             <p>Final Score: <span id="finalScore">0</span></p>
-            <button id="restartBtn" class="action-button" tabindex="0" aria-label="Play Again">Play Again</button>
+            <button id="restartBtn" class="action-button" type="button" tabindex="0" aria-label="Play Again">Play Again</button>
         </div>
     </div>
     

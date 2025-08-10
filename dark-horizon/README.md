@@ -1,62 +1,61 @@
 # DARK HORIZON
 
-A fast, responsive space shooter built with HTML5 Canvas, CSS, and vanilla JavaScript (ES Modules).
+Fast, responsive space shooter built with HTML5 Canvas and vanilla JavaScript (ES modules). Collect stars, blast asteroids, and chase a new high score.
 
 ## Quick start
 
-Because the app uses ES modules (`type="module"` in `index.html`), you must run it from a web server (opening the file directly will fail with a module/CORS error).
+Because `index.html` loads ES modules (`type="module"`), the game must run from a web server (file:// won’t work).
 
-- Option A – VS Code: install the “Live Server” extension and click “Go Live”.
-- Option B – Python 3 built‑in server (Windows PowerShell):
-  - Prefer: `py -m http.server 8000`
+- Option A — VS Code Live Server: install “Live Server”, then click “Go Live”.
+- Option B — Windows PowerShell (Python 3):
+  - Preferred: `py -m http.server 8000`
   - Fallback: `python -m http.server 8000`
   - Then open http://localhost:8000
-- Option C – Node (if installed): `npx serve -l 8000 .`
+- Option C — Node.js (if installed): `npx serve -l 8000 .`
 
-Troubleshooting
-- Blank page or “Failed to load module script/CORS”: you’re likely opening `index.html` via file://. Start a local server (see above).
-- “python is not recognized”: use `py -m http.server 8000`, or install Python 3 from python.org.
-- High score not saving: your browser may be blocking `localStorage` in private mode.
+### Troubleshooting
+
+- Blank page or “Failed to load module script/CORS” → you opened via file://. Start a server (see above).
+- `python` not recognized on Windows → use `py -m http.server 8000`.
+- Port already in use → try another port, e.g. `py -m http.server 5500`.
+- High score not saving → Private/Incognito may block `localStorage`.
 
 ## How to play
 
-- Move: Arrow keys or WASD, or move your mouse/touch to guide the ship
+- Move: Arrow keys or WASD, or guide with mouse/touch
 - Shoot: Space, mouse click, or tap
-- Score: +20 per star collected, +10 per asteroid destroyed
+- Score: +20 per star, +10 per asteroid
 - Game over: Collide with an asteroid
 - Restart: Click “Launch Mission” or “Play Again”
 
 ## Features
 
-- Responsive on desktop, tablet, and mobile
-- Multiple inputs: keyboard, mouse, and touch
-- Smooth 60fps animations with requestAnimationFrame
-- Starfield, nebulae, engine glow, explosions, and particle effects
-- High score saved with `localStorage`
+- Desktop and mobile friendly (keyboard, mouse, and touch)
+- Smooth animations with requestAnimationFrame
+- Starfield, nebulae, engine glow, explosions, and particle FX
+- High score persisted with `localStorage`
 
 ## Project structure
 
-- `index.html` – App shell and canvas
-- `style.css` – Layout and responsive styles
-- `game.js` – Game loop, input, state, rendering
-- `entities.js` – Entities (Player, Asteroid, Bullet, Star, FX, Background)
-- `constants.js` – Tunable settings (colors, sizes, speeds, spawn rates)
-- `favicon.png` – Site icon
+- `index.html` — App shell and canvas
+- `style.css` — Layout and responsive styles
+- `game.js` — Game loop, input, state, rendering
+- `entities.js` — Entities (Player, Asteroid, Bullet, Star, FX, Background)
+- `constants.js` — Tunable settings (colors, sizes, speeds, spawn rates)
+- `favicon.png` — Site icon
 
 ## Technical notes
 
-- HTML5 Canvas rendering with gradients and shadows for visual depth
+- Canvas-based rendering with gradients and shadows
 - ES modules split logic across `game.js`, `entities.js`, and `constants.js`
-- Mobile friendly: touch events and slightly slower asteroid speed on phones
+- Mobile tweaks: touch controls and reduced asteroid speed
 - High score key: `darkHorizonHighScore` in `localStorage`
 
 ## Deploy
 
-This is a static site. You can host it anywhere that serves static files:
+This is a static site—no build step required. Host anywhere that serves static files:
 
-- GitHub Pages: push the repo, enable Pages for the main branch/root
-- Netlify/Vercel: drag‑and‑drop the folder or connect the repo (no build step)
+- GitHub Pages: push the repo, enable Pages for the root of the main branch
+- Netlify/Vercel: drag-and-drop the folder or connect the repo
 
-## Attributions
-
-Inspired by classic arcade shooters. Built for fun and learning.
+— Inspired by classic arcade shooters. Enjoy the flight.

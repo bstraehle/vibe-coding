@@ -56,7 +56,7 @@ class DarkHorizon {
 
         this.engineTrail = new EngineTrail();
 
-    this.resizeCanvas();
+        this.resizeCanvas();
         this.initBackground();
         this.drawBackground();
         
@@ -94,7 +94,11 @@ class DarkHorizon {
         this.handleStartKeyDown = this.handleStartKeyDown.bind(this);
         this.handleRestartKeyDown = this.handleRestartKeyDown.bind(this);
         this.resizeCanvas = this.resizeCanvas.bind(this);
+        this.handleResize = this.handleResize.bind(this);
         this.shoot = this.shoot.bind(this);
+        this.movementKeys = new Set([
+            'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD', 'KeyW', 'KeyS'
+        ]);
     }
 
     /**
@@ -104,6 +108,8 @@ class DarkHorizon {
         // Keyboard events
         window.addEventListener('keydown', this.handleKeyDown);
         window.addEventListener('keyup', this.handleKeyUp);
+        // Window resize (debounced via rAF)
+        window.addEventListener('resize', this.handleResize);
         // Mouse events
         this.canvas.addEventListener('mousemove', this.handleMouseMove);
         this.canvas.addEventListener('click', this.shoot);
@@ -116,8 +122,6 @@ class DarkHorizon {
         // Keyboard accessibility for buttons
         this.startBtn.addEventListener('keydown', this.handleStartKeyDown);
         this.restartBtn.addEventListener('keydown', this.handleRestartKeyDown);
-        // Window resize
-        window.addEventListener('resize', this.resizeCanvas);
     }
 
     /**
@@ -131,8 +135,7 @@ class DarkHorizon {
             e.preventDefault();
             this.shoot();
         }
-        const movementKeys = ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','KeyA','KeyD','KeyW','KeyS'];
-        if (movementKeys.includes(e.code)) {
+        if (this.movementKeys.has(e.code)) {
             this.mousePos.x = 0;
             this.mousePos.y = 0;
         }
@@ -223,6 +226,7 @@ class DarkHorizon {
      * Fire a bullet if cooldown allows.
      */
     shoot() {
+    if (!this.gameRunning) return;
         const now = Date.now();
         if (now - this.lastShot < this.shotCooldown) return;
         this.bullets.push(this.createBullet());
@@ -238,25 +242,46 @@ class DarkHorizon {
         this.player.x = this.canvas.width / 2 - this.player.width / 2;
         this.player.y = this.canvas.height - this.player.height - CONFIG.PLAYER.SPAWN_Y_OFFSET;
     }
+
+    /**
+     * Debounced resize handler to avoid excessive work during window resizing.
+     */
+    handleResize() {
+        if (this._resizeScheduled) return;
+        this._resizeScheduled = true;
+        requestAnimationFrame(() => {
+            this._resizeScheduled = false;
+            this.resizeCanvas();
+            this.initBackground();
+            if (!this.gameRunning) {
+                this.drawBackground();
+            }
+        });
+    }
    
     /**
      * Start or restart the game, reset scores and state.
      */
     startGame() {
         this.gameRunning = true;
+        this.resetGameState();
+        this.hideGameInfo();
+        this.initBackground();
+        this.gameLoop();
+    }
 
+    /**
+     * Reset score and clear dynamic entity arrays.
+     */
+    resetGameState() {
         this.score = 0;
         this.updateScore();
-                
         this.asteroids = [];
         this.bullets = [];
         this.explosions = [];
         this.particles = [];
         this.stars = [];
-
-        this.hideGameInfo();
-        this.initBackground();
-        this.gameLoop();
+        this.lastShot = 0;
     }
 
     /**
@@ -435,7 +460,7 @@ class DarkHorizon {
                 if (this.checkCollision(bullet, asteroid)) {
                     this.bullets.splice(i, 1);
                     this.asteroids.splice(j, 1);
-                    this.score += 10;
+                    this.score += CONFIG.GAME.ASTEROID_SCORE;
                     this.createExplosion(asteroid.x + asteroid.width / 2, asteroid.y + asteroid.height / 2);
                     break;
                 }
@@ -453,20 +478,19 @@ class DarkHorizon {
         for (let i = this.stars.length - 1; i >= 0; i--) {
             const star = this.stars[i];
             if (this.checkCollision(this.player, star)) {
-                for (let p = 0; p < 12; p++) {
+                for (let p = 0; p < CONFIG.STAR.PARTICLE_BURST; p++) {
                     this.particles.push(new Particle(
                         star.x + star.width / 2,
                         star.y + star.height / 2,
-                        Math.cos((Math.PI * 2 * p) / 12) * (Math.random() * 3 + 2),
-                        Math.sin((Math.PI * 2 * p) / 12) * (Math.random() * 3 + 2),
-                        20,
-                        20,
-                        Math.random() * 2 + 1,
-                        CONFIG.COLORS.STAR.BASE
+                        Math.cos((Math.PI * 2 * p) / CONFIG.STAR.PARTICLE_BURST) * (Math.random() * 3 + 2),
+                        Math.sin((Math.PI * 2 * p) / CONFIG.STAR.PARTICLE_BURST) * (Math.random() * 3 + 2),
+                        CONFIG.STAR.PARTICLE_LIFE,
+                        CONFIG.STAR.PARTICLE_LIFE,
+                        Math.random() * CONFIG.STAR.PARTICLE_SIZE_VARIATION + CONFIG.STAR.PARTICLE_SIZE_MIN, CONFIG.COLORS.STAR.BASE
                     ));
                 }
                 this.stars.splice(i, 1);
-                this.score += 20;
+                this.score += CONFIG.GAME.STAR_SCORE;
             }
         }
         this.updateScore();
@@ -582,7 +606,7 @@ class DarkHorizon {
      */
     initBackground() {
         if (this.gameRunning) {
-            this.nebulaConfigs = Nebula.init(this.canvas, this.isMobile());
+            this.nebulaConfigs = Nebula.init(this.canvas, this._isMobile);
         }
         this.starField = StarField.init(this.canvas);
     }
