@@ -1,21 +1,14 @@
 :root {
-    --color-bg: #000;
-    --color-header-bg: #rgba(0,0,0,0);
-    --color-score-bg: #000;
-    --color-score-border: #444;
+    --color-bg: #111;
+    --color-border: #333;
     --color-text: #fff;
-    --color-text-secondary: #ccc;
-    --color-title-shadow: rgba(255,255,255,1);
+    --color-text-secondary: #ddd;
+    --color-title-shadow: #ddd;
     --color-btn-gradient-start: #333;
     --color-btn-gradient-end: #555;
     --color-btn-gradient-hover-start: #555;
     --color-btn-gradient-hover-end: #777;
     --color-btn-focus-outline: #b20000;
-    --color-game-over-content-bg: rgba(20,20,20,0.95);
-    --color-game-over-content-border: #333;
-    --color-game-over-content-shadow: rgba(255,255,255,0.1);
-    --color-btn-shadow: rgba(0,0,0,0.3);
-    --color-btn-shadow-hover: rgba(0,0,0,0.4);
 }
 * {
     box-sizing: border-box;
@@ -45,7 +38,6 @@ body {
 }
 .game-header {
     backface-visibility: hidden;
-    background-color: var(--color-header-bg);
     left: 0;
     padding: 10px 20px;
     position: absolute;
@@ -68,8 +60,8 @@ body {
     z-index: 20;
 }
 .score {
-    background-color: var(--color-score-bg);
-    border: 1px solid var(--color-score-border);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     color: var(--color-text);
     display: inline-block;
@@ -111,7 +103,6 @@ body {
     background: linear-gradient(45deg, var(--color-btn-gradient-start), var(--color-btn-gradient-end));
     border: none;
     border-radius: 25px;
-    box-shadow: 0 4px 8px var(--color-btn-shadow);
     color: var(--color-text);
     cursor: pointer;
     display: block;
@@ -123,11 +114,9 @@ body {
 }
 .action-button:hover {
     background: linear-gradient(45deg, var(--color-btn-gradient-hover-start), var(--color-btn-gradient-hover-end));
-    box-shadow: 0 6px 12px var(--color-btn-shadow-hover);
 }
 .action-button:focus {
     background: linear-gradient(45deg, var(--color-btn-gradient-hover-start), var(--color-btn-gradient-hover-end));
-    box-shadow: 0 6px 12px var(--color-btn-shadow-hover);
     outline: 2px solid var(--color-btn-focus-outline);
     outline-offset: 2px;
 }
@@ -143,10 +132,9 @@ body {
     z-index: 100;
 }
 .game-over-content {
-    background: var(--color-game-over-content-bg);
-    border: 2px solid var(--color-game-over-content-border);
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
     border-radius: 20px;
-    box-shadow: 0 0 30px var(--color-game-over-content-shadow);
     padding: 40px;
     text-align: center;
 }

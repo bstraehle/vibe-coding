@@ -24,8 +24,8 @@ export const CONFIG = {
         },
         BACKGROUND: {
             TOP: '#000',
-            MID: '#111',
-            BOTTOM: '#222'
+            MID: '#222',
+            BOTTOM: '#444'
         },
         BULLET: {
             SHADOW: '#ff6b6b',
@@ -46,10 +46,10 @@ export const CONFIG = {
             GRAD_OUT: 'rgba(255, 50, 0, 0)'
         },
         NEBULA: {
-            N1: 'rgba(80, 130, 255, 0.3)',
-            N2: 'rgba(255, 100, 100, 0.3)',
-            N3: 'rgba(255, 200, 100, 0.3)',
-            N4: 'rgba(180, 80, 255, 0.3)',
+            N1: 'rgba(80, 130, 255, 0.1)',
+            N2: 'rgba(255, 100, 100, 0.1)',
+            N3: 'rgba(255, 200, 100, 0.1)',
+            N4: 'rgba(180, 80, 255, 0.1)',
             N1_OUT: 'rgba(80, 130, 255, 0)',
             N2_OUT: 'rgba(255, 100, 100, 0)',
             N3_OUT: 'rgba(255, 200, 100, 0)',
@@ -99,9 +99,12 @@ export const CONFIG = {
         STAR_SPAWN_RATE: 0.01
     },
     NEBULA: {
-        COUNT: 10,
-        RADIUS_MIN: 50,
-        RADIUS_MAX: 250
+        COUNT_DESKTOP: 8,
+        COUNT_MOBILE: 4,
+        RADIUS_MIN_DESKTOP: 100,
+        RADIUS_MAX_DESKTOP: 250,
+        RADIUS_MIN_MOBILE: 50,
+        RADIUS_MAX_MOBILE: 125
     },
     PLAYER: {
         SPAWN_Y_OFFSET: 100

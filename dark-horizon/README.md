@@ -1,63 +1,62 @@
 # DARK HORIZON
 
-A responsive space shooting game built with HTML5 Canvas, CSS3, and vanilla JavaScript.
+A fast, responsive space shooter built with HTML5 Canvas, CSS, and vanilla JavaScript (ES Modules).
 
-## 🎮 Game Features
+## Quick start
 
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Multiple Control Schemes**: 
-  - Keyboard: Arrow keys or WASD for movement, SPACE to shoot
-  - Mouse: Click to move ship and shoot
-  - Touch: Tap to move ship and shoot (mobile-friendly)
-- **Dynamic Gameplay**: 
-  - Destroy asteroids to earn points
-  - Collect stars for bonus points
-  - Avoid asteroid collisions
-  - Explosion effects when destroying asteroids
-- **Score System**: 
-  - High score persistence using localStorage
-  - Real-time score display
-- **Visual Effects**: 
-  - Starfield background
-  - Engine glow on spaceship
-  - Explosion animations
-  - Smooth animations
+Because the app uses ES modules (`type="module"` in `index.html`), you must run it from a web server (opening the file directly will fail with a module/CORS error).
 
-## 🚀 How to Play
+- Option A – VS Code: install the “Live Server” extension and click “Go Live”.
+- Option B – Python 3 built‑in server (Windows PowerShell):
+  - Prefer: `py -m http.server 8000`
+  - Fallback: `python -m http.server 8000`
+  - Then open http://localhost:8000
+- Option C – Node (if installed): `npx serve -l 8000 .`
 
-1. **Movement**: Use arrow keys, WASD, mouse, or touch to control your spaceship
-2. **Shooting**: Press SPACE, click, or tap to shoot lasers
-3. **Objective**:
-   - Collect stars for 20 points each
-   - Destroy asteroids for 10 points each
-   - Avoid hitting asteroids with your ship
-4. **Game Over**: When you collide with an asteroid, the game ends
-5. **Restart**: Click "Launch Mission" or "Play Again" to restart
+Troubleshooting
+- Blank page or “Failed to load module script/CORS”: you’re likely opening `index.html` via file://. Start a local server (see above).
+- “python is not recognized”: use `py -m http.server 8000`, or install Python 3 from python.org.
+- High score not saving: your browser may be blocking `localStorage` in private mode.
 
-## 🛠️ Technical Details
+## How to play
 
-- **HTML5 Canvas**: For smooth 2D graphics rendering
-- **CSS3**: Responsive design with media queries
-- **Vanilla JavaScript**: No external dependencies
-- **Local Storage**: High score persistence
-- **Touch Events**: Mobile-friendly controls
-- **RequestAnimationFrame**: Smooth 60fps animations
+- Move: Arrow keys or WASD, or move your mouse/touch to guide the ship
+- Shoot: Space, mouse click, or tap
+- Score: +20 per star collected, +10 per asteroid destroyed
+- Game over: Collide with an asteroid
+- Restart: Click “Launch Mission” or “Play Again”
 
-## 📱 Responsive Design
+## Features
 
-The game automatically adapts to different screen sizes:
-- **Desktop**: Full keyboard and mouse support
-- **Tablet**: Touch controls with keyboard fallback
-- **Mobile**: Optimized touch controls and UI scaling
+- Responsive on desktop, tablet, and mobile
+- Multiple inputs: keyboard, mouse, and touch
+- Smooth 60fps animations with requestAnimationFrame
+- Starfield, nebulae, engine glow, explosions, and particle effects
+- High score saved with `localStorage`
 
-## 🎯 Game Mechanics
+## Project structure
 
-- **Collision Detection**: Precise hitbox-based collision system
-- **Object Pooling**: Efficient memory management for game objects
-- **Smooth Movement**: Interpolated movement for mouse/touch controls
-- **Cooldown System**: Prevents rapid-fire shooting
-- **Dynamic Spawning**: Random asteroid and star generation
+- `index.html` – App shell and canvas
+- `style.css` – Layout and responsive styles
+- `game.js` – Game loop, input, state, rendering
+- `entities.js` – Entities (Player, Asteroid, Bullet, Star, FX, Background)
+- `constants.js` – Tunable settings (colors, sizes, speeds, spawn rates)
+- `favicon.png` – Site icon
 
-## 🌟 Credits
+## Technical notes
 
-Inspired by classic space shooting games. Built with modern web technologies for optimal performance and user experience.
+- HTML5 Canvas rendering with gradients and shadows for visual depth
+- ES modules split logic across `game.js`, `entities.js`, and `constants.js`
+- Mobile friendly: touch events and slightly slower asteroid speed on phones
+- High score key: `darkHorizonHighScore` in `localStorage`
+
+## Deploy
+
+This is a static site. You can host it anywhere that serves static files:
+
+- GitHub Pages: push the repo, enable Pages for the main branch/root
+- Netlify/Vercel: drag‑and‑drop the folder or connect the repo (no build step)
+
+## Attributions
+
+Inspired by classic arcade shooters. Built for fun and learning.

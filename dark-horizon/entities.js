@@ -242,43 +242,84 @@ export class Nebula {
      * Generates an array of nebula objects with randomized position, radius, and color properties.
      *
      * @param {HTMLCanvasElement} canvas - The canvas element used to determine nebula positions and sizes.
+     * @param {boolean} isMobile - Indicates if the rendering is for a mobile device, affecting nebula count and size.
      * @returns {Array<Object>} Array of nebula configuration objects, each containing x, y, r, color0, and color1.
      */
-    static init(canvas) {
+    static init(canvas, isMobile) {
         const nebulaColors = [
             { color0: CONFIG.COLORS.NEBULA.N1, color1: CONFIG.COLORS.NEBULA.N1_OUT },
             { color0: CONFIG.COLORS.NEBULA.N2, color1: CONFIG.COLORS.NEBULA.N2_OUT },
             { color0: CONFIG.COLORS.NEBULA.N3, color1: CONFIG.COLORS.NEBULA.N3_OUT },
             { color0: CONFIG.COLORS.NEBULA.N4, color1: CONFIG.COLORS.NEBULA.N4_OUT }
         ];
-        return Array.from({ length: CONFIG.NEBULA.COUNT }, () => {
+        const count = isMobile ? CONFIG.NEBULA.COUNT_MOBILE : CONFIG.NEBULA.COUNT_DESKTOP;
+        const radiusMin = isMobile ? CONFIG.NEBULA.RADIUS_MIN_MOBILE : CONFIG.NEBULA.RADIUS_MIN_DESKTOP;
+        const radiusMax = isMobile ? CONFIG.NEBULA.RADIUS_MAX_MOBILE : CONFIG.NEBULA.RADIUS_MAX_DESKTOP;
+        return Array.from({ length: count }, () => {
             const colorSet = nebulaColors[Math.floor(Math.random() * nebulaColors.length)];
+            const baseR = Math.random() * radiusMax + radiusMin;
+            const blobCount = (isMobile ? 3 : 5) + Math.floor(Math.random() * (isMobile ? 2 : 3));
+            const blobs = Array.from({ length: blobCount }, () => {
+                const dist = Math.random() * baseR * 0.6;
+                const ang = Math.random() * Math.PI * 2;
+                const r = baseR * (0.35 + Math.random() * 0.6);
+                const sx = 0.8 + Math.random() * 1.2;
+                const sy = 0.6 + Math.random() * 1.0;
+                return {
+                    baseOx: Math.cos(ang) * dist,
+                    baseOy: Math.sin(ang) * dist,
+                    ox: 0,
+                    oy: 0,
+                    r,
+                    rot: Math.random() * Math.PI * 2,
+                    sx,
+                    sy,
+                    wobbleAmp: 4 + Math.random() * 8,
+                    wobbleRate: 0.002 + Math.random() * 0.004,
+                    wobbleOffset: Math.random() * 1000
+                };
+            });
             return {
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                r: Math.random() * CONFIG.NEBULA.RADIUS_MAX + CONFIG.NEBULA.RADIUS_MIN,
+                r: baseR,
                 color0: colorSet.color0,
                 color1: colorSet.color1,
-                dx: (Math.random() - 0.5) * 0.7,
-                dy: (Math.random() - 0.5) * 0.7,
-                dr: (Math.random() - 0.5) * 0.3
+                dx: (Math.random() - 0.5) * 0.4,
+                dy: (Math.random() - 0.5) * 0.4,
+                dr: (Math.random() - 0.5) * 0.15,
+                t: Math.floor(Math.random() * 1000),
+                blobs
             };
         });
     }
     /**
      * Animates nebula by updating position and radius over time.
-     * @param {Array<Object>} nebulaConfigs - Array of nebula configuration objects.
-     * @param {number} time - Current game time/frame.
      * @param {HTMLCanvasElement} canvas - The canvas element for bounds.
+     * @param {Array<Object>} nebulaConfigs - Array of nebula configuration objects.
+     * @param {boolean} isMobile - Indicates if the rendering is for a mobile device, affecting nebula count and size.
      */
-    static update(nebulaConfigs, time, canvas) {
+    static update(canvas, nebulaConfigs, isMobile) {
         for (const nebula of nebulaConfigs) {
             nebula.x += nebula.dx;
             nebula.y += nebula.dy;
             nebula.r += nebula.dr;
+            nebula.t += 1;
+            const radiusMin = isMobile ? CONFIG.NEBULA.RADIUS_MIN_MOBILE : CONFIG.NEBULA.RADIUS_MIN_DESKTOP;
+            const radiusMax = isMobile ? CONFIG.NEBULA.RADIUS_MAX_MOBILE : CONFIG.NEBULA.RADIUS_MAX_DESKTOP;
             if (nebula.x < 0 || nebula.x > canvas.width) nebula.dx *= -1;
             if (nebula.y < 0 || nebula.y > canvas.height) nebula.dy *= -1;
-            if (nebula.r < CONFIG.NEBULA.RADIUS_MIN || nebula.r > CONFIG.NEBULA.RADIUS_MAX) nebula.dr *= -1;
+            if (nebula.r < radiusMin || nebula.r > radiusMax) nebula.dr *= -1;
+            if (nebula.blobs) {
+                for (let i = 0; i < nebula.blobs.length; i++) {
+                    const b = nebula.blobs[i];
+                    const phase = nebula.t * b.wobbleRate + b.wobbleOffset;
+                    const wobX = Math.cos(phase) * b.wobbleAmp;
+                    const wobY = Math.sin(phase * 0.9) * b.wobbleAmp * 0.7;
+                    b.ox = b.baseOx + wobX;
+                    b.oy = b.baseOy + wobY;
+                }
+            }
         }
     }
     /**
@@ -292,14 +333,24 @@ export class Nebula {
     static draw(ctx, canvas, nebulaConfigs) {
         ctx.save();
         for (const nebula of nebulaConfigs) {
-            const grad = ctx.createRadialGradient(
-                nebula.x, nebula.y, 0,
-                nebula.x, nebula.y, nebula.r
-            );
-            grad.addColorStop(0, nebula.color0);
-            grad.addColorStop(1, nebula.color1);
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const blobs = nebula.blobs || [{
+                ox: 0, oy: 0, r: nebula.r, rot: 0, sx: 1, sy: 1
+            }];
+            for (const b of blobs) {
+                ctx.save();
+                ctx.translate(nebula.x + (b.ox || 0), nebula.y + (b.oy || 0));
+                ctx.rotate(b.rot || 0);
+                ctx.scale(b.sx || 1, b.sy || 1);
+                const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.r || nebula.r);
+                grad.addColorStop(0, nebula.color0);
+                grad.addColorStop(1, nebula.color1);
+                ctx.fillStyle = grad;
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.beginPath();
+                ctx.arc(0, 0, b.r || nebula.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
         }
         ctx.restore();
     }
