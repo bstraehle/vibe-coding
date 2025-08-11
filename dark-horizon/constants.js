@@ -142,7 +142,7 @@ export const CONFIG = deepFreeze({
         PAUSE_OVERLAY: {
             BACKDROP: COLORS.UI.OVERLAY_BACKDROP,
             FONT: 'bold 28px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
-            MESSAGE: 'Paused - ESC to resume',
+            MESSAGE: 'Paused - Esc to resume',
             TEXT_ALIGN: 'center',
             TEXT_BASELINE: 'middle',
             TEXT_COLOR: COLORS.UI.OVERLAY_TEXT
