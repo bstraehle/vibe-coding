@@ -101,6 +101,8 @@ class DarkHorizon {
         this.handleRestartKeyDown = this.handleRestartKeyDown.bind(this);
         this.resizeCanvas = this.resizeCanvas.bind(this);
         this.handleResize = this.handleResize.bind(this);
+        this.handleStartScreenFocusGuard = this.handleStartScreenFocusGuard.bind(this);
+        this.handleGameOverFocusGuard = this.handleGameOverFocusGuard.bind(this);
         this.shoot = this.shoot.bind(this);
         this.movementKeys = new Set([
             'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD', 'KeyW', 'KeyS'
@@ -128,6 +130,14 @@ class DarkHorizon {
         // Keyboard accessibility for buttons
         this.startBtn.addEventListener('keydown', this.handleStartKeyDown);
         this.restartBtn.addEventListener('keydown', this.handleRestartKeyDown);
+        // Focus guard while Start screen is visible
+        this.startBtn.addEventListener('blur', this.handleStartScreenFocusGuard, true);
+        this.gameInfo.addEventListener('mousedown', this.handleStartScreenFocusGuard, true);
+        this.gameInfo.addEventListener('touchstart', this.handleStartScreenFocusGuard, { passive: false });
+        // Focus guard while Game Over overlay is visible (prevents losing focus on mobile)
+        this.restartBtn.addEventListener('blur', this.handleGameOverFocusGuard, true);
+        this.gameOverScreen.addEventListener('mousedown', this.handleGameOverFocusGuard, true);
+        this.gameOverScreen.addEventListener('touchstart', this.handleGameOverFocusGuard, { passive: false });
         // Pause toggle
         window.addEventListener('keydown', (e) => {
             if ((e.code === 'Escape' || e.key === 'Escape' || e.key === 'Esc') && this.gameRunning && !e.repeat) {
@@ -140,6 +150,60 @@ class DarkHorizon {
                 this.togglePause();
             }
         });
+    }
+
+    /**
+     * Keep focus on the start button when the Start overlay is visible.
+     * Prevents taps/clicks from removing focus on mobile.
+     * @param {Event} e
+     */
+    handleStartScreenFocusGuard(e) {
+        if (!this.gameInfo || this.gameInfo.classList.contains('hidden')) return;
+        if (e) {
+            const targetIsStart = e.target === this.startBtn || (e.target && e.target.closest && e.target.closest('#startBtn'));
+            if (!targetIsStart) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+            }
+        }
+        this.focusWithRetry(this.startBtn);
+    }
+
+    /**
+     * Keep focus on the restart button when the Game Over overlay is visible.
+     * Prevents taps/clicks from removing focus on mobile.
+     * @param {Event} e
+     */
+    handleGameOverFocusGuard(e) {
+        if (!this.gameOverScreen || this.gameOverScreen.classList.contains('hidden')) return;
+        if (e) {
+            const targetIsRestart = e.target === this.restartBtn || (e.target && e.target.closest && e.target.closest('#restartBtn'));
+            if (!targetIsRestart) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+            }
+        }
+        this.focusWithRetry(this.restartBtn);
+    }
+
+    /**
+     * Ensure a given element receives focus reliably (helps on mobile Safari/Chrome).
+     * @param {HTMLElement} el
+     */
+    focusWithRetry(el) {
+        if (!el) return;
+        const tryFocus = () => {
+            try { el.focus({ preventScroll: true }); } catch (_) { /* noop */ }
+        };
+        tryFocus();
+        if (document.activeElement !== el) {
+            requestAnimationFrame(() => {
+                tryFocus();
+                if (document.activeElement !== el) {
+                    setTimeout(() => { tryFocus(); }, 250);
+                }
+            });
+        }
     }
 
     /**
@@ -244,7 +308,7 @@ class DarkHorizon {
      * Fire a bullet if cooldown allows.
      */
     shoot() {
-    if (!this.gameRunning || this.paused) return;
+        if (!this.gameRunning || this.paused) return;
         const now = Date.now();
         if (now - this.lastShot < this.shotCooldown) return;
         this.bullets.push(this.createBullet());
@@ -345,9 +409,8 @@ class DarkHorizon {
     showGameOver() {
         document.getElementById('finalScore').textContent = this.score;
         this.gameOverScreen.classList.remove('hidden');
-        setTimeout(() => {
-            this.restartBtn.focus();
-        }, 100);
+    // Focus the restart button reliably, even on mobile and after prior blurs
+    this.focusWithRetry(this.restartBtn);
     }
     
     /**
